@@ -4,7 +4,8 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-$client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+// $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
+$client = new rabbitMQClient("localRabbitMQ.ini","testServer");
 if (isset($argv[1]))
 {
   $msg = $argv[1];
@@ -15,9 +16,12 @@ else
 }
 
 $request = array();
-$request['type'] = "Login";
-$request['username'] = "steve";
-$request['password'] = "password";
+#$request['type'] = "Login";
+$request['type'] = "login";
+//$request['username'] = "steve";
+$request['username'] = "sam_i";
+//$request['password'] = "password";
+$request['password'] = "gogiants";
 $request['message'] = $msg;
 $response = $client->send_request($request);
 //$response = $client->publish($request);
