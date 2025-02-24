@@ -15,6 +15,8 @@ if (!isset($input['type'])) {
 $type = $input['type'];
 
 // Include RabbitMQ PHP client files
+echo "current user: ".get_current_user();
+echo "script was executed under user: ".exec('whoami');
 require_once('/home/dfc27vm/git/rabbitmqphp_example/path.inc');
 require_once('/home/dfc27vm/git/rabbitmqphp_example/get_host_info.inc');
 require_once('/home/dfc27vm/git/rabbitmqphp_example/rabbitMQLib.inc');
@@ -40,7 +42,6 @@ switch ($type) {
 
         // Connect to RabbitMQ server
         $client = new rabbitMQClient('/home/dfc27vm/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
-
         // Send the request to RabbitMQ and get the response
         $response = $client->send_request($msg);
 
