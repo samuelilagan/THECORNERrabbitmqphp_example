@@ -1,164 +1,107 @@
 <?php
-// Debugging: Output the incoming POST request data
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-// Read the raw POST data (useful for JSON requests)
-$input = json_decode(file_get_contents('php://input'), true);
-
-// Check if the type of the request is set (login, register, logout, validate_session)
-if (!isset($input['type'])) {
-    echo json_encode(["status" => "error", "message" => "Missing request type"]);
-    exit(0);
-}
-
-$type = $input['type'];
-
 // Include RabbitMQ PHP client files
 require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/path.inc');
 require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/get_host_info.inc');
 require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/rabbitMQLib.inc');
 
-// Handle the different request types
-switch ($type) {
-    case "login":
-        // Handle login request
-        if (!isset($input['username']) || !isset($input['password'])) {
-            echo json_encode(["status" => "error", "message" => "Missing username or password"]);
-            exit(0);
-        }
+session_start();
 
-        $username = $input['username'];
-        $password = $input['password'];
+function sendRequest($request) {
+    $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
 
-        // Create the message to send to RabbitMQ for login
-        $msg = [
-            "type" => "login",
-            "username" => $username,
-            "password" => $password
-        ];
-
-        // Connect to RabbitMQ server
-        $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
-
-        // Send the request to RabbitMQ and get the response
-        $response = $client->send_request($msg);
+    try {
+        $response = $client->send_request($request);
 
         // Log the raw response for debugging
-        error_log("Raw Response from RabbitMQ: " . print_r($response, true));
+        error_log("Raw Response: " . print_r($response, true));
 
-        // Handle the response from RabbitMQ
-        if (is_string($response)) {
-            $response = json_decode($response, true);  // Decode the JSON response
+        // Ensure the response is valid JSON
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ["status" => "error", "message" => "Invalid JSON response from RabbitMQ"];
         }
 
-        if ($response && isset($response['status']) && $response['status'] == "success") {
-            // If login is successful, set session cookie with the session token
-            setcookie("sessionToken", $response['sessionToken'], time() + 3600, "/"); // Expires in 1 hour
-            echo json_encode(["status" => "success", "message" => "Login successful", "sessionToken" => $response['sessionToken']]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Login failed"]);
-        }
-        break;
-
-    case "register":
-        // Handle registration request
-        if (!isset($input['username']) || !isset($input['password'])) {
-            echo json_encode(["status" => "error", "message" => "Missing username or password"]);
-            exit(0);
-        }
-
-        $username = $input['username'];
-        $password = $input['password'];
-
-        // Create the message to send to RabbitMQ for registration
-        $msg = [
-            "type" => "register",
-            "username" => $username,
-            "password" => $password
-        ];
-
-        // Connect to RabbitMQ server
-        $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
-
-        // Send the request to RabbitMQ and get the response
-        $response = $client->send_request($msg);
-
-        // Log the raw response for debugging
-        error_log("Raw Response from RabbitMQ: " . print_r($response, true));
-
-        // Handle the response from RabbitMQ
-        if (is_string($response)) {
-            $response = json_decode($response, true);  // Decode the JSON response
-        }
-
-        if ($response && isset($response['status']) && $response['status'] == "success") {
-            echo json_encode(["status" => "success", "message" => "Registration successful"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Registration failed"]);
-        }
-        break;
-
-    case "logout":
-        // Handle logout request
-case "logout":
-    if (isset($input['sessionToken'])) {
-        // Send the logout request to RabbitMQ to clean the session token from the database
-        $msg = [
-            "type" => "logout",
-            "sessionToken" => $input['sessionToken']
-        ];
-
-        // Connect to RabbitMQ server
-        $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
-
-        // Send the request to RabbitMQ and get the response
-        $response = $client->send_request($msg);
-
-        // Check the response
-        if ($response['status'] === 'success') {
-            // Clear session token on the client side
-            setcookie("sessionToken", "", time() - 3600, "/"); // Delete the session token cookie
-            echo json_encode(["status" => "success", "message" => "Logout successful"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Logout failed"]);
-        }
-    } else {
-        echo json_encode(["status" => "error", "message" => "Session token required"]);
+        return $response;
+    } catch (Exception $e) {
+        return ["status" => "error", "message" => "Request failed: " . $e->getMessage()];
     }
-    break;
-
-    case "validate_session":
-        // Handle session validation
-        if (isset($_COOKIE['sessionToken'])) {
-            $sessionToken = $_COOKIE['sessionToken'];
-
-            // Create the message to send to RabbitMQ for session validation
-            $msg = [
-                "type" => "validate_session",
-                "sessionToken" => $sessionToken
-            ];
-
-            // Connect to RabbitMQ server
-            $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
-
-            // Send the request to RabbitMQ and get the response
-            $response = $client->send_request($msg);
-
-            // Handle the response from RabbitMQ
-            if ($response && isset($response['status']) && $response['status'] == "success") {
-                echo json_encode(["status" => "success", "message" => "Valid session", "sessionToken" => $sessionToken]);
-            } else {
-                echo json_encode(["status" => "error", "message" => "Session expired or invalid"]);
-            }
-        } else {
-            echo json_encode(["status" => "error", "message" => "No active session"]);
-        }
-        break;
-
-    default:
-        echo json_encode(["status" => "error", "message" => "Invalid request type"]);
-        break;
 }
 
-exit(0);
+// Handle incoming requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if (!isset($data['type'])) {
+        echo json_encode(["status" => "error", "message" => "Invalid request"]);
+        exit();
+    }
+
+    switch ($data['type']) {
+        case 'login':
+            if (!isset($data['username']) || !isset($data['password'])) {
+                echo json_encode(["status" => "error", "message" => "Missing username or password"]);
+                exit();
+            }
+
+            // Ensure the user is not already logged in
+            if (isset($_SESSION['sessionToken'])) {
+                echo json_encode(["status" => "error", "message" => "Already logged in"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "login",
+                "username" => $data['username'],
+                "password" => $data['password']
+            ];
+            $response = sendRequest($request);
+
+            if ($response['status'] === "success") {
+                $_SESSION['sessionToken'] = $response['sessionToken'];
+            }
+
+            echo json_encode($response);
+            break;
+
+        case 'logout':
+            if (!isset($_SESSION['sessionToken'])) {
+                echo json_encode(["status" => "error", "message" => "No active session"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "logout",
+                "sessionToken" => $_SESSION['sessionToken']
+            ];
+            $response = sendRequest($request);
+
+            if ($response['status'] === "success") {
+                session_unset();
+                session_destroy();
+            }
+
+            echo json_encode($response);
+            break;
+
+        case 'register':
+            if (!isset($data['username']) || !isset($data['password'])) {
+                echo json_encode(["status" => "error", "message" => "Missing username or password"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "register",
+                "username" => $data['username'],
+                "password" => $data['password']
+            ];
+            $response = sendRequest($request);
+
+            echo json_encode($response);
+            break;
+
+        default:
+            echo json_encode(["status" => "error", "message" => "Invalid request type"]);
+    }
+} else {
+    echo json_encode(["status" => "error", "message" => "Invalid request method"]);
+}
+?>
