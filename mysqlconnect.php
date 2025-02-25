@@ -26,26 +26,30 @@ function generateSessionToken($length = 32) {
 function doLogin($username, $password) {
     global $db;
 
-    // Check if user exists
+    // Check if session token already exists in the session
+    if (isset($_SESSION['sessionToken']) && $_SESSION['sessionToken'] != "") {
+        // User is already logged in, no need to create a new token
+        return [
+            "status" => "success",
+            "message" => "Already logged in",
+            "sessionToken" => $_SESSION['sessionToken']
+        ];
+    }
+
+    // User is not logged in, proceed with normal login
     $query = "SELECT * FROM user_info WHERE username = :username";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // If user exists and password is correct
     if ($user && password_verify($password, $user['password'])) {
-        // Check if user already has a valid session token
-        if ($user['session_token'] && strtotime($user['token_expiry']) > time()) {
-            // Return existing session token if already logged in
-            return ["status" => "success", "message" => "Already logged in", "sessionToken" => $user['session_token']];
-        }
-
-        // Generate a new session token and set expiry time
+        // Generate a new session token
         $sessionToken = generateSessionToken();
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // TTL: 1 hour
-
-        // Update session token and expiry in the database
+        $_SESSION['sessionToken'] = $sessionToken; // Store session token in session
+        
+        // Optionally update the session token in the database
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bindParam(':sessionToken', $sessionToken);
@@ -53,10 +57,16 @@ function doLogin($username, $password) {
         $updateStmt->bindParam(':username', $username);
         $updateStmt->execute();
 
-        // Return success with session token
-        return ["status" => "success", "message" => "Login successful", "sessionToken" => $sessionToken];
+        return [
+            "status" => "success",
+            "message" => "Login successful",
+            "sessionToken" => $sessionToken
+        ];
     } else {
-        return ["status" => "error", "message" => "Login failed"];
+        return [
+            "status" => "error",
+            "message" => "Login failed"
+        ];
     }
 }
 
@@ -64,46 +74,19 @@ function doLogin($username, $password) {
 function doLogout($sessionToken) {
     global $db;
 
-    // Remove the session token from the database
+    // Clear the session token from the session
+    unset($_SESSION['sessionToken']); // Remove from session storage
+
+    // Optionally update the session token in the database to NULL
     $updateQuery = "UPDATE user_info SET session_token = NULL, token_expiry = NULL WHERE session_token = :sessionToken";
     $updateStmt = $db->prepare($updateQuery);
     $updateStmt->bindParam(':sessionToken', $sessionToken);
     $updateStmt->execute();
 
-    // Return success message
-    return ["status" => "success", "message" => "Logout successful"];
-}
-
-// Function to validate session token
-function validateSessionToken($sessionToken) {
-    global $db;
-
-    // Fetch the session token details from the database
-    $query = "SELECT * FROM user_info WHERE session_token = :sessionToken";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':sessionToken', $sessionToken);
-    $stmt->execute();
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user) {
-        // Check if the session token is expired
-        if (strtotime($user['token_expiry']) < time()) {
-            return ["status" => "error", "message" => "Session expired"];
-        }
-        return ["status" => "success", "message" => "Session valid", "username" => $user['username']];
-    } else {
-        return ["status" => "error", "message" => "Invalid session token"];
-    }
-}
-
-// Function to clean up expired sessions from the database
-function cleanupExpiredSessions() {
-    global $db;
-
-    // Delete sessions that have expired
-    $query = "DELETE FROM user_info WHERE token_expiry < NOW()";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
+    return [
+        "status" => "success",
+        "message" => "Logout successful"
+    ];
 }
 
 // Function to handle registration
@@ -152,8 +135,6 @@ function requestProcessor($request) {
             return doLogin($request['username'], $request['password']);
         case "logout":
             return doLogout($request['sessionToken']);
-        case "validate_session":
-            return validateSessionToken($request['sessionToken']);
         case "register":
             return doRegister($request['username'], $request['password']);
         default:

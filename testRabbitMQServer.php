@@ -4,28 +4,39 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Function to process the incoming requests from RabbitMQ
-function requestProcessor($request)
+
+function doLogin($username,$password)
 {
-    echo "Received request: ".PHP_EOL;
-    var_dump($request); // Log the request for debugging purposes
-
-    if (!isset($request['type'])) {
-        return ["status" => "error", "message" => "Unsupported message type"];
-    }
-
-    // Create a new RabbitMQ client to forward the request to the database processor
-    $client = new rabbitMQClient("localRabbitMQ.ini", "testServer");
-
-    // Forward the request to the database processor
-    $response = $client->send_request($request);
-
-    // Return the response from the database processor back to the client
-    return $response;
+   // lookup username in databas
+   // check password
+   return true;
+   //return false if not valid
 }
 
-// Create and start the RabbitMQ server to listen for incoming requests
-$server = new rabbitMQServer("localRabbitMQ.ini", "testServer");
+
+function requestProcessor($request)
+{
+ echo "received request".PHP_EOL;
+ var_dump($request);
+ if(!isset($request['type']))
+ {
+   return "ERROR: unsupported message type";
+ }
+ switch ($request['type'])
+ {
+   case "login":
+     return doLogin($request['username'],$request['password']);
+   case "validate_session":
+     return doValidate($request['sessionId']);
+ }
+ return array("returnCode" => '0', 'message'=>"Server received request and processed");
+}
+
+
+// $server = new rabbitMQServer("testRabbitMQ.ini","testServer");
+$server = new rabbitMQServer("localRabbitMQ.ini","testServer");
+
+
 $server->process_requests('requestProcessor');
 exit();
 ?>
