@@ -1,0 +1,32 @@
+#!/usr/bin/php
+<?php
+
+// Check if there is a command-line argument passed
+if ($argc < 2) {
+    echo "Usage: php login.php <message>\n";
+    exit(1); // Exit with an error code
+}
+
+// Get the message from the command line argument
+$message = $argv[1]; 
+
+// Include RabbitMQ PHP client files
+//require_once('/home/samilagan/git/rabbitmqphp_example/path.inc');
+//require_once('/home/samilagan/git/rabbitmqphp_example/get_host_info.inc');
+//require_once('/home/samilagan/git/rabbitmqphp_example/rabbitMQLib.inc');
+
+// Create a new RabbitMQ client instance
+$client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/testRabbitMQ.ini', 'testServer');
+
+// Prepare the message to be sent to the RabbitMQ server
+$request = array();
+$request['type'] = 'login'; // You can change this to other actions like 'register'
+$request['message'] = $message; // Use the message passed from the command line
+
+// Send the message to RabbitMQ and get the response
+$response = $client->send_request($request);
+
+// Output the response from RabbitMQ server
+echo "Server Response: " . $response . "\n";
+?>
+
