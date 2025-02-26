@@ -1,13 +1,13 @@
 <?php
 // Include RabbitMQ PHP client files
-require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/path.inc');
-require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/get_host_info.inc');
-require_once('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/rabbitMQLib.inc');
+require_once('/home/samilagan/git/rabbitmqphp_example/path.inc');
+require_once('/home/samilagan/git/rabbitmqphp_example/get_host_info.inc');
+require_once('/home/samilagan/git/rabbitmqphp_example/rabbitMQLib.inc');
 
 session_start();
 
 function sendRequest($request) {
-    $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/rabbitmq-server/localRabbitMQ.ini', 'testServer');
+    $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/localRabbitMQ.ini', 'testServer');
 
     try {
         $response = $client->send_request($request);
