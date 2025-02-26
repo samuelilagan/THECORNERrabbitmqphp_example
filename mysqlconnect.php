@@ -26,6 +26,10 @@ function generateSessionToken($length = 32) {
 function doLogin($username, $password) {
     global $db;
 
+    // Print the request data received
+    echo "Received login request: ";
+    var_dump(['username' => $username, 'password' => $password]);
+
     // Check if session token already exists in the session
     if (isset($_SESSION['sessionToken']) && $_SESSION['sessionToken'] != "") {
         // User is already logged in, no need to create a new token
@@ -74,6 +78,10 @@ function doLogin($username, $password) {
 function doLogout($sessionToken) {
     global $db;
 
+    // Print the request data received
+    echo "Received logout request: ";
+    var_dump(['sessionToken' => $sessionToken]);
+
     // Clear the session token from the session
     unset($_SESSION['sessionToken']); // Remove from session storage
 
@@ -92,6 +100,10 @@ function doLogout($sessionToken) {
 // Function to handle registration
 function doRegister($username, $password) {
     global $db;
+
+    // Print the request data received
+    echo "Received registration request: ";
+    var_dump(['username' => $username, 'password' => $password]);
 
     // Check if user already exists
     $query = "SELECT * FROM user_info WHERE username = :username";
@@ -120,30 +132,4 @@ function doRegister($username, $password) {
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
 }
-
-// Function to process incoming requests
-function requestProcessor($request) {
-    echo "Received request" . PHP_EOL;
-    var_dump($request);
-
-    if (!isset($request['type'])) {
-        return ["status" => "error", "message" => "Unsupported message type"];
-    }
-
-    switch ($request['type']) {
-        case "login":
-            return doLogin($request['username'], $request['password']);
-        case "logout":
-            return doLogout($request['sessionToken']);
-        case "register":
-            return doRegister($request['username'], $request['password']);
-        default:
-            return ["status" => "error", "message" => "Invalid request type"];
-    }
-}
-
-// Start the RabbitMQ server for database processing
-$server = new rabbitMQServer("localRabbitMQ.ini", "testServer");
-$server->process_requests('requestProcessor');
-exit();
 ?>
