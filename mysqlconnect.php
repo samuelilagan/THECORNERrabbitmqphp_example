@@ -4,8 +4,11 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Database connection settings
+// Database connection settings (need to change this for using on other systems)
 $dsn = 'mysql:host=127.0.0.1;dbname=users';
+// Since you are connected through a VPN, use the VPN IP address of the VM hosting 
+// the database in mysqlconnect.php:
+// $dsn = 'mysql:host=VPN_IP_ADDRESS;dbname=users';
 $dbUser = 'testUser';
 $dbPassword = '12345';
 
@@ -53,7 +56,7 @@ function doLogin($username, $password) {
         $_SESSION['sessionToken'] = $sessionToken; // Store session token in session
         
         // Optionally update the session token in the database
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $expiry = time() + (60 * 60); // expiration is 1 hour, can change based on needs
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bindParam(':sessionToken', $sessionToken);
