@@ -5,7 +5,8 @@ require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
 // Database connection settings (need to change this for using on other systems)
-$dsn = 'mysql:host=127.0.0.1;dbname=users';
+// $dsn = 'mysql:host=127.0.0.1;dbname=users';
+$dsn = 'mysql:host=148.77.110.18;dbname=users'; 
 // Since you are connected through a VPN, use the VPN IP address of the VM hosting 
 // the database in mysqlconnect.php:
 // $dsn = 'mysql:host=VPN_IP_ADDRESS;dbname=users';
