@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script>
+        // Handle server responses
+        function HandleLoginResponse(response) {
+            try {
+                // Log the raw response for debugging
+                // 
+                console.log("Server Response: ", response);
+
+                // Try to parse the response as JSON
+                var text = JSON.parse(response);
+
+                // Check if login is successful
+                if (text.status === "success" && text.redirect) {
+                    // Store the session token in sessionStorage
+                    sessionStorage.setItem('sessionToken', text.sessionToken);
+                    window.location.href = text.redirect;
+                    
+                } else {
+                    document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
+                }
+            } catch (e) {
+                // If there's a parsing error, display the raw response to help debug
+                document.getElementById("textResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+            }
+        }
+
+        // Send login request
+        function SendLoginRequest(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            var loginRequest = {
+                type: "login",  // Specify the request type
+                username: username,
+                password: password
+            };
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleLoginResponse(request.responseText);
+                }
+            };
+
+            request.send(JSON.stringify(loginRequest));
+        }
+
+        // Send registration request
+        function SendRegistrationRequest(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            var username = document.getElementById("regUsername").value;
+            var password = document.getElementById("regPassword").value;
+
+            var registerRequest = {
+                type: "register",  // Specify the request type for registration
+                username: username,
+                password: password
+            };
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleLoginResponse(request.responseText);
+                }
+            };
+
+            request.send(JSON.stringify(registerRequest));
+        }
+
+        // Send logout request
+        function SendLogoutRequest() {
+            var logoutRequest = {
+                type: "logout"  // Specify the request type for logout
+            };
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleLoginResponse(request.responseText);
+                }
+            };
+
+            request.send(JSON.stringify(logoutRequest));
+        }
+
+        // Send session validation request
+        // function CheckSession() {
+        //     var sessionRequest = {
+        //         type: "validate_session"  // Specify the request type for session validation
+        //     };
+
+        //     var request = new XMLHttpRequest();
+        //     request.open("POST", "login.php", true);
+        //     request.setRequestHeader("Content-Type", "application/json");
+
+        //     request.onreadystatechange = function () {
+        //         if (request.readyState == 4 && request.status == 200) {
+        //             HandleLoginResponse(request.responseText);
+        //         }
+        //     };
+
+        //     request.send(JSON.stringify(sessionRequest));
+        // }
+    </script>
+</head>
+<body>
+    <h1>Login Page</h1>
+    
+    <h2>Login</h2>
+    <form onsubmit="SendLoginRequest(event)">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+        <input type="submit" value="Login">
+    </form>
+
+    <h2>Registration</h2>
+    <form onsubmit="SendRegistrationRequest(event)">
+        <label for="regUsername">Username:</label>
+        <input type="text" id="regUsername" name="username" required>
+        <br><br>
+        <label for="regPassword">Password:</label>
+        <input type="password" id="regPassword" name="password" required>
+        <br><br>
+        <input type="submit" value="Register">
+    </form>
+
+    <h2>Logout</h2>
+    <button onclick="SendLogoutRequest()">Logout</button>
+
+    <!-- <h2>Session Validation</h2>
+    <button onclick="CheckSession()">Check if Logged In</button> -->
+
+    <div id="textResponse">
+        Awaiting response...
+    </div>
+</body>
+</html>
