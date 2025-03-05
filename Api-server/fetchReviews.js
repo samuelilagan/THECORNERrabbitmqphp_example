@@ -2,14 +2,14 @@ const { ApifyClient } = require('apify-client');
 
 // Initialize the Apify client with your API token 
 const client = new ApifyClient({ 
-token: 'apify_api_zHfmckLnkcbfPHdntHmED5kGpxYH962eDpz7', 
+token: 'apify_api_IXZmdm4hEGcpg3bB1mYIWibqMFm0zh4AmTY7', 
 }); 
 
 (async () => { 
 try { 
 // Define input parameters for the API 
 const input = { 
-"restaurantUrls": ["https://www.yelp.com/biz/jollibee-jersey-city-7?osq=Jollibee"], 
+"restaurantUrls": ["https://www.yelp.com/biz/jollibee-jersey-city-7?osq=Jollibee&limit=10"], 
 "maxReviews": 10
 };
 
