@@ -10,7 +10,7 @@ try {
 // Define input parameters for the API 
 const input = { 
 "restaurantUrls": ["https://www.yelp.com/biz/jollibee-jersey-city-7?osq=Jollibee"], 
-"maxReviews": 50
+"maxReviews": 10
 };
 
  // Run the Restaurant Review Aggregator actor 
