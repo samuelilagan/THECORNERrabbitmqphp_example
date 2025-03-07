@@ -132,4 +132,25 @@ function doRegister($username, $password) {
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
 }
+
+// Function to fetch the user_info table
+function fetchUserInfo() {
+    global $db;
+
+    try {
+        $query = "SELECT id, username, created_at FROM user_info";
+        $stmt = $db->query($query);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "users" => $users
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch user info: " . $e->getMessage()
+        ];
+    }
+}
 ?>

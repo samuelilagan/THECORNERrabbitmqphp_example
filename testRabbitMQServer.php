@@ -22,6 +22,8 @@ function requestProcessor($request)
             return doLogout($request['sessionToken']);
         case "register":
             return doRegister($request['username'], $request['password']);
+        case "fetch_user_info":
+            return fetchUserInfo();
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }
