@@ -1,4 +1,8 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 include 'rabbitMQLib.inc'; // Connection
 header('Content-Type: application/json');
 
