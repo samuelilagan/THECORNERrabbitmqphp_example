@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include 'rabbitMQLib.inc'; // Connection
+include '/home/melissa/git/rabbitmqphp_example/Frontend-server/rabbitMQLib.inc'; // Connection
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
