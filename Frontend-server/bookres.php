@@ -1,7 +1,7 @@
 <?php
 
 
-include '/home/melissa/git/rabbitmqphp_example/Frontend-server/rabbitMQLib.inc'; // Connection
+include '/home/melissa/git/rabbitmqphp_example/Frontend-server/rabbitMQLib.inc';
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
