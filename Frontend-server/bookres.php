@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 include '/home/melissa/git/rabbitmqphp_example/Frontend-server/rabbitMQLib.inc'; // Connection
 header('Content-Type: application/json');
