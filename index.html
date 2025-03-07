@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>The Corner Table</title>
     <script>
         // Handle server responses
         function HandleLoginResponse(response) {
             try {
                 // Log the raw response for debugging
+                // 
                 console.log("Server Response: ", response);
 
                 // Try to parse the response as JSON
                 var text = JSON.parse(response);
-                document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
+
+                // Check if login is successful
+                if (text.status === "success" && text.redirect) {
+                    // Store the session token in sessionStorage
+                    sessionStorage.setItem('sessionToken', text.sessionToken);
+                    window.location.href = text.redirect;
+                    
+                } else {
+                    document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
+                }
             } catch (e) {
                 // If there's a parsing error, display the raw response to help debug
                 document.getElementById("textResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
@@ -92,28 +102,28 @@
         }
 
         // Send session validation request
-        function CheckSession() {
-            var sessionRequest = {
-                type: "validate_session"  // Specify the request type for session validation
-            };
+        // function CheckSession() {
+        //     var sessionRequest = {
+        //         type: "validate_session"  // Specify the request type for session validation
+        //     };
 
-            var request = new XMLHttpRequest();
-            request.open("POST", "login.php", true);
-            request.setRequestHeader("Content-Type", "application/json");
+        //     var request = new XMLHttpRequest();
+        //     request.open("POST", "login.php", true);
+        //     request.setRequestHeader("Content-Type", "application/json");
 
-            request.onreadystatechange = function () {
-                if (request.readyState == 4 && request.status == 200) {
-                    HandleLoginResponse(request.responseText);
-                }
-            };
+        //     request.onreadystatechange = function () {
+        //         if (request.readyState == 4 && request.status == 200) {
+        //             HandleLoginResponse(request.responseText);
+        //         }
+        //     };
 
-            request.send(JSON.stringify(sessionRequest));
-        }
+        //     request.send(JSON.stringify(sessionRequest));
+        // }
     </script>
 </head>
 <body>
-    <h1>Login Page</h1>
-
+    <h1>The Corner Table</h1>
+    
     <h2>Login</h2>
     <form onsubmit="SendLoginRequest(event)">
         <label for="username">Username:</label>
@@ -139,8 +149,8 @@
     <h2>Logout</h2>
     <button onclick="SendLogoutRequest()">Logout</button>
 
-    <h2>Session Validation</h2>
-    <button onclick="CheckSession()">Check if Logged In</button>
+    <!-- <h2>Session Validation</h2>
+    <button onclick="CheckSession()">Check if Logged In</button> -->
 
     <div id="textResponse">
         Awaiting response...

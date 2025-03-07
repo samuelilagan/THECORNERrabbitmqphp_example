@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Welcome to The Corner Table!</h1>
+
+    <h2>User Information</h2>
+    <p>Welcome, <span id="username">Guest</span>!</p>
+
+    <a href="filter.html"><h2></h2></a>
+
+    <h2>Database Tables</h2>
+    <button onclick="FetchUserInfoTable()">Load User Info Table</button>
+    <div id="userInfoTableResponse">
+        <!-- User info table will be displayed here -->
+    </div>
+
+    <h2>Logout</h2>
+    <button onclick="SendLogoutRequest()">Logout</button>
+
+    <script>
+        // Handle server responses
+        function HandleResponse(response) {
+            try {
+                console.log("Server Response: ", response);
+                var text = JSON.parse(response);
+
+                if (text.status === "success" && text.redirect) {
+                    // Redirect if needed
+                    window.location.href = text.redirect;
+                } else {
+                    document.getElementById("userInfoTableResponse").innerHTML = "Response: " + text.message + "<p>";
+                }
+            } catch (e) {
+                document.getElementById("userInfoTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+            }
+        }
+
+        // Fetch user info table
+        function FetchUserInfoTable() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleUserInfoTableResponse(request.responseText);
+                }
+            };
+
+            var fetchUserInfoRequest = {
+                type: "fetch_user_info"  // Specify the request type for fetching user info
+            };
+
+            request.send(JSON.stringify(fetchUserInfoRequest));
+        }
+
+        // Handle the response for fetching user info table
+        function HandleUserInfoTableResponse(response) {
+            try {
+                var data = JSON.parse(response);
+
+                if (data.status === "success") {
+                    var users = data.users;
+                    var html = "<h3>User Info Table:</h3><table border='1'><tr><th>ID</th><th>Username</th><th>Created At</th></tr>";
+
+                    users.forEach(function (user) {
+                        html += `<tr><td>${user.id}</td><td>${user.username}</td><td>${user.created_at}</td></tr>`;
+                    });
+
+                    html += "</table>";
+                    document.getElementById("userInfoTableResponse").innerHTML = html;
+                } else {
+                    document.getElementById("userInfoTableResponse").innerHTML = "Error: " + data.message;
+                }
+            } catch (e) {
+                document.getElementById("userInfoTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+            }
+        }
+
+        // Logout function
+        function SendLogoutRequest() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            var logoutRequest = {
+                type: "logout"
+            };
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    var response = JSON.parse(request.responseText);
+                    if (response.status === "success") {
+                        // Redirect to login page after successful logout
+                        window.location.href = "index.html";
+                    }
+                }
+            };
+
+            request.send(JSON.stringify(logoutRequest));
+        }
+    </script>
+</body>
+</html>

@@ -59,6 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($response['status'] === "success") {
                 $_SESSION['sessionToken'] = $response['sessionToken'];
+                echo json_encode([
+                    "status" => "success",
+                    "sessionToken" => $response['sessionToken'],
+                    "redirect" => "home.html"  // Indicate the redirect target
+                ]);
+                exit();
             }
 
             echo json_encode($response);
@@ -99,6 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             echo json_encode($response);
             break;
+        
+        case 'fetch_user_info':
+            $request = [
+                "type" => "fetch_user_info"
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;   
 
         default:
             echo json_encode(["status" => "error", "message" => "Invalid request type"]);
