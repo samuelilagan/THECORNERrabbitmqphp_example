@@ -6,7 +6,6 @@ require_once('/home/samilagan/git/rabbitmqphp_example/rabbitMQLib.inc');
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
-
 session_start();
 
 function sendRequest($request) {
@@ -62,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode([
                     "status" => "success",
                     "sessionToken" => $response['sessionToken'],
+                    "username" => $response['username'], // Forward the username
                     "redirect" => "home.html"  // Indicate the redirect target
                 ]);
                 exit();
@@ -112,7 +112,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $response = sendRequest($request);
             echo json_encode($response);
-            break;   
+            break;
+        
+        case 'submit_rating_review':
+            if (!isset($data['user_id']) || !isset($data['table_id']) || !isset($data['rating']) || !isset($data['review'])) {
+                echo json_encode(["status" => "error", "message" => "Missing required fields for rating and review"]);
+                exit();
+            }
+
+            // Log the request data
+            error_log("Submit rating review request: " . print_r($data, true));
+
+            $request = [
+                "type" => "submit_rating_review",
+                "user_id" => $data['user_id'],
+                "table_id" => $data['table_id'],
+                "rating" => $data['rating'],
+                "review" => $data['review']
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
+
+        case 'fetch_ratings_reviews':
+            if (!isset($data['table_id'])) {
+                echo json_encode(["status" => "error", "message" => "Missing table_id for fetching ratings and reviews"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "fetch_ratings_reviews",
+                "table_id" => $data['table_id']
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
 
         default:
             echo json_encode(["status" => "error", "message" => "Invalid request type"]);
