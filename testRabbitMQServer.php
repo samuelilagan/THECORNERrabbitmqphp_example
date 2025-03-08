@@ -24,6 +24,12 @@ function requestProcessor($request)
             return doRegister($request['username'], $request['password']);
         case "fetch_user_info":
             return fetchUserInfo();
+        
+        case "submit_rating_review":
+            return submitRatingReview($request['user_id'], $request['table_id'], $request['rating'], $request['review']);
+        case "fetch_ratings_reviews":
+            return fetchRatingsReviews($request['table_id']);
+
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }

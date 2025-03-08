@@ -36,7 +36,8 @@ function doLogin($username, $password) {
         return [
             "status" => "success",
             "message" => "Already logged in",
-            "sessionToken" => $_SESSION['sessionToken']
+            "sessionToken" => $_SESSION['sessionToken'],
+            "username" => $_SESSION['username'] // Return the username
         ];
     }
 
@@ -47,11 +48,16 @@ function doLogin($username, $password) {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Debug: Print the user data fetched from the database
+    echo "User data from database: ";
+    var_dump($user);
+
     if ($user && password_verify($password, $user['password'])) {
         // Generate a new session token
         $sessionToken = generateSessionToken();
         $_SESSION['sessionToken'] = $sessionToken; // Store session token in session
-        
+        $_SESSION['username'] = $username; // Store username in session
+
         // Optionally update the session token in the database
         $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
@@ -64,7 +70,8 @@ function doLogin($username, $password) {
         return [
             "status" => "success",
             "message" => "Login successful",
-            "sessionToken" => $sessionToken
+            "sessionToken" => $sessionToken,
+            "username" => $username // Return the username
         ];
     } else {
         return [
@@ -150,6 +157,65 @@ function fetchUserInfo() {
         return [
             "status" => "error",
             "message" => "Failed to fetch user info: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to submit a rating and review
+function submitRatingReview($username, $tableUsername, $rating, $review) {
+    global $db;
+
+    // Validate rating
+    if ($rating < 1 || $rating > 5) {
+        return ["status" => "error", "message" => "Rating must be between 1 and 5"];
+    }
+
+    try {
+        // Insert the rating and review into the ratings_reviews table
+        $query = "INSERT INTO ratings_reviews (user_id, table_id, rating, review) VALUES (:user_id, :table_id, :rating, :review)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':user_id', $username);
+        $stmt->bindParam(':table_id', $tableUsername);
+        $stmt->bindParam(':rating', $rating);
+        $stmt->bindParam(':review', $review);
+        $stmt->execute();
+
+        return [
+            "status" => "success",
+            "message" => "Rating and review submitted successfully"
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to submit rating and review: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to fetch ratings and reviews for a specific table
+function fetchRatingsReviews($tableUsername) {
+    global $db;
+
+    try {
+        // Fetch ratings and reviews for the specified table_id
+        $query = "SELECT r.rating, r.review, r.created_at, u.username 
+                  FROM ratings_reviews r 
+                  JOIN user_info u ON r.user_id = u.username 
+                  WHERE r.table_id = :table_id 
+                  ORDER BY r.created_at DESC";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':table_id', $tableUsername);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch ratings and reviews: " . $e->getMessage()
         ];
     }
 }
