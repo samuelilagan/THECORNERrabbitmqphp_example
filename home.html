@@ -20,7 +20,10 @@
     </div>
 
     <h2>Rate and Review</h2>
-    <form onsubmit="SubmitRatingReview(event)">
+    <form id="rateAndReviewForm" onsubmit="SubmitRatingReview(event)" style="display: none;">
+        <label for="tableUsername">User to Rate:</label>
+        <input type="text" id="tableUsername" name="tableUsername" readonly>
+        <br><br>
         <label for="rating">Rating (1-5):</label>
         <input type="number" id="rating" name="rating" min="1" max="5" required>
         <br><br>
@@ -82,10 +85,15 @@
 
                 if (data.status === "success") {
                     var users = data.users;
-                    var html = "<h3>User Info Table:</h3><table border='1'><tr><th>ID</th><th>Username</th><th>Created At</th></tr>";
+                    var html = "<h3>User Info Table:</h3><table border='1'><tr><th>ID</th><th>Username</th><th>Created At</th><th>Action</th></tr>";
 
                     users.forEach(function (user) {
-                        html += `<tr><td>${user.id}</td><td>${user.username}</td><td>${user.created_at}</td></tr>`;
+                        html += `<tr>
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.created_at}</td>
+                            <td><button onclick="SelectUserForReview('${user.username}')">Rate and Review</button></td>
+                        </tr>`;
                     });
 
                     html += "</table>";
@@ -98,12 +106,20 @@
             }
         }
 
+        // Function to select a user for review
+        function SelectUserForReview(username) {
+            // Set the selected user in the form
+            document.getElementById("tableUsername").value = username;
+            document.getElementById("rateAndReviewForm").style.display = "block"; // Show the form
+        }
+
         // Submit a rating and review
         function SubmitRatingReview(event) {
             event.preventDefault();
 
             var rating = document.getElementById("rating").value;
             var review = document.getElementById("review").value;
+            var tableUsername = document.getElementById("tableUsername").value; // Get the selected user from the form
             var username = sessionStorage.getItem('username'); // Get the logged-in user's username from sessionStorage
 
             if (!username) {
@@ -114,7 +130,7 @@
             console.log("Submitting review with data:", {
                 type: "submit_rating_review",
                 user_id: username, // Use the logged-in user's username
-                table_id: username, // Use the logged-in user's username as table_id
+                table_id: tableUsername, // Use the selected user's username as table_id
                 rating: rating,
                 review: review
             });
@@ -126,14 +142,14 @@
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
                     HandleResponse(request.responseText);
-                    FetchRatingsReviews(username); // Refresh reviews after submission
+                    FetchRatingsReviews(tableUsername); // Refresh reviews after submission
                 }
             };
 
             var submitReviewRequest = {
                 type: "submit_rating_review",
                 user_id: username, // Use the logged-in user's username
-                table_id: username, // Use the logged-in user's username as table_id
+                table_id: tableUsername, // Use the selected user's username as table_id
                 rating: rating,
                 review: review
             };
@@ -141,9 +157,9 @@
             request.send(JSON.stringify(submitReviewRequest));
         }
 
-        // Fetch ratings and reviews
+        // Fetch ratings and reviews for a specific user
         function FetchRatingsReviews(tableUsername) {
-            console.log("Fetching reviews with tableUsername:", tableUsername);
+            console.log("Fetching reviews for user:", tableUsername);
 
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
@@ -157,7 +173,7 @@
 
             var fetchReviewsRequest = {
                 type: "fetch_ratings_reviews",
-                table_id: tableUsername // Use the logged-in user's username as table_id
+                table_id: tableUsername // Use the selected user's username as table_id
             };
 
             request.send(JSON.stringify(fetchReviewsRequest));
