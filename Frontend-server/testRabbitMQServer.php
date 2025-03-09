@@ -22,6 +22,8 @@ function requestProcessor($request)
             return doLogout($request['sessionToken']);
         case "register":
             return doRegister($request['username'], $request['password']);
+        case "filter":
+            return doFilter($request['city'], $request['keyword'], $request['rating']);
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }
