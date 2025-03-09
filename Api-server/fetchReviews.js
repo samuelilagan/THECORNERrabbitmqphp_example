@@ -7,8 +7,8 @@ const datasetId = "QubOQR8wBfoAMaEZQ"; // Replace with actual dataset ID
 
 const dbConfig = {
     host: process.env.MYSQL_HOST || 'localhost',
-    user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || 'test123',
+    user: process.env.MYSQL_USER || 'testUser',
+    password: process.env.MYSQL_PASSWORD || '12345',
     database: process.env.MYSQL_DATABASE || 'users'
 };
 
