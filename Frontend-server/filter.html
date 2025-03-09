@@ -12,10 +12,10 @@
                 var data = JSON.parse(response);
 
                 if (data.status === "success") {
-                    var users = data.users;
+                    var reviews = data.reviews;
                     var html = "<h3>Recommendations:</h3><table border='1'><tr><th>Place Name</th><th>Place Address</th><th>Review Rating</th><th>Author Name</th></tr>";
 
-                    users.forEach(function (user) {
+                    reviews.forEach(function (review) {
                         html += `<tr>
                             <td>${reviews.placeName}</td>
                             <td>${reviews.placeAddress}</td>
