@@ -13,16 +13,18 @@
 
     <a href="filter.html"><h2></h2></a>
 
-    <h2>Database Tables</h2>
-    <button onclick="FetchUserInfoTable()">Load User Info Table</button>
-    <div id="userInfoTableResponse">
-        <!-- User info table will be displayed here -->
+    <h2>Reviews Table</h2>
+    <button onclick="FetchReviewsTable()">Load Reviews Table</button>
+    <div id="reviewsTableResponse">
+        <!-- Reviews table will be displayed here -->
     </div>
 
     <h2>Rate and Review</h2>
-    <form id="rateAndReviewForm" onsubmit="SubmitRatingReview(event)" style="display: none;">
-        <label for="tableUsername">User to Rate:</label>
-        <input type="text" id="tableUsername" name="tableUsername" readonly>
+    <form id="rateAndReviewForm" onsubmit="SubmitRatingReview(event)">
+        <label for="placeName">Place Name:</label>
+        <select id="placeName" name="placeName" required>
+            <!-- Options will be populated by JavaScript -->
+        </select>
         <br><br>
         <label for="rating">Rating (1-5):</label>
         <input type="number" id="rating" name="rating" min="1" max="5" required>
@@ -42,75 +44,76 @@
     <button onclick="SendLogoutRequest()">Logout</button>
 
     <script>
-        // Handle server responses
-        function HandleResponse(response) {
-            try {
-                console.log("Server Response: ", response);
-                var text = JSON.parse(response);
-
-                if (text.status === "success" && text.redirect) {
-                    // Redirect if needed
-                    window.location.href = text.redirect;
-                } else {
-                    document.getElementById("userInfoTableResponse").innerHTML = "Response: " + text.message + "<p>";
-                }
-            } catch (e) {
-                document.getElementById("userInfoTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
-            }
-        }
-
-        // Fetch user info table
-        function FetchUserInfoTable() {
+        // Fetch and populate the reviews table
+        function FetchReviewsTable() {
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/json");
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleUserInfoTableResponse(request.responseText);
+                    HandleReviewsTableResponse(request.responseText);
                 }
             };
 
-            var fetchUserInfoRequest = {
-                type: "fetch_user_info"  // Specify the request type for fetching user info
+            var fetchReviewsRequest = {
+                type: "fetch_all_reviews"
             };
 
-            request.send(JSON.stringify(fetchUserInfoRequest));
+            request.send(JSON.stringify(fetchReviewsRequest));
         }
 
-        // Handle the response for fetching user info table
-        function HandleUserInfoTableResponse(response) {
+        function HandleReviewsTableResponse(response) {
             try {
                 var data = JSON.parse(response);
 
                 if (data.status === "success") {
-                    var users = data.users;
-                    var html = "<h3>User Info Table:</h3><table border='1'><tr><th>ID</th><th>Username</th><th>Created At</th><th>Action</th></tr>";
+                    var reviews = data.reviews;
 
-                    users.forEach(function (user) {
+                    // Filter unique placeNames
+                    var uniquePlaceNames = [];
+                    var placeNameMap = new Map();
+                    reviews.forEach(function (review) {
+                        if (!placeNameMap.has(review.placeName)) {
+                            placeNameMap.set(review.placeName, true);
+                            uniquePlaceNames.push(review);
+                        }
+                    });
+
+                    // Display unique placeNames in a dropdown
+                    var placeDropdown = document.getElementById("placeName");
+                    placeDropdown.innerHTML = ""; // Clear existing options
+                    uniquePlaceNames.forEach(function (place) {
+                        var option = document.createElement("option");
+                        option.value = place.placeName;
+                        option.text = place.placeName;
+                        placeDropdown.appendChild(option);
+                    });
+
+                    // Display the reviews table
+                    var html = "<h3>Reviews Table:</h3><table border='1'><tr><th>ID</th><th>Place Name</th><th>Place Address</th><th>Provider</th><th>Review Text</th><th>Review Date</th><th>Review Rating</th><th>Author Name</th></tr>";
+
+                    reviews.forEach(function (review) {
                         html += `<tr>
-                            <td>${user.id}</td>
-                            <td>${user.username}</td>
-                            <td>${user.created_at}</td>
-                            <td><button onclick="SelectUserForReview('${user.username}')">Rate and Review</button></td>
+                            <td>${review.id}</td>
+                            <td>${review.placeName}</td>
+                            <td>${review.placeAddress}</td>
+                            <td>${review.provider}</td>
+                            <td>${review.reviewText}</td>
+                            <td>${review.reviewDate}</td>
+                            <td>${review.reviewRating}</td>
+                            <td>${review.authorName}</td>
                         </tr>`;
                     });
 
                     html += "</table>";
-                    document.getElementById("userInfoTableResponse").innerHTML = html;
+                    document.getElementById("reviewsTableResponse").innerHTML = html;
                 } else {
-                    document.getElementById("userInfoTableResponse").innerHTML = "Error: " + data.message;
+                    document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
                 }
             } catch (e) {
-                document.getElementById("userInfoTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+                document.getElementById("reviewsTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
             }
-        }
-
-        // Function to select a user for review
-        function SelectUserForReview(username) {
-            // Set the selected user in the form
-            document.getElementById("tableUsername").value = username;
-            document.getElementById("rateAndReviewForm").style.display = "block"; // Show the form
         }
 
         // Submit a rating and review
@@ -119,21 +122,13 @@
 
             var rating = document.getElementById("rating").value;
             var review = document.getElementById("review").value;
-            var tableUsername = document.getElementById("tableUsername").value; // Get the selected user from the form
-            var username = sessionStorage.getItem('username'); // Get the logged-in user's username from sessionStorage
+            var placeName = document.getElementById("placeName").value;
+            var username = sessionStorage.getItem('username'); // Get the logged-in user's username
 
             if (!username) {
                 alert("You must be logged in to submit a review.");
                 return;
             }
-
-            console.log("Submitting review with data:", {
-                type: "submit_rating_review",
-                user_id: username, // Use the logged-in user's username
-                table_id: tableUsername, // Use the selected user's username as table_id
-                rating: rating,
-                review: review
-            });
 
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
@@ -141,15 +136,20 @@
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleResponse(request.responseText);
-                    FetchRatingsReviews(tableUsername); // Refresh reviews after submission
+                    var response = JSON.parse(request.responseText);
+                    if (response.status === "success") {
+                        alert("Review submitted successfully!");
+                        FetchAndDisplayReviews(placeName); // Refresh the reviews for the selected place
+                    } else {
+                        alert("Error: " + response.message);
+                    }
                 }
             };
 
             var submitReviewRequest = {
                 type: "submit_rating_review",
-                user_id: username, // Use the logged-in user's username
-                table_id: tableUsername, // Use the selected user's username as table_id
+                username: username,
+                placeName: placeName,
                 rating: rating,
                 review: review
             };
@@ -157,30 +157,28 @@
             request.send(JSON.stringify(submitReviewRequest));
         }
 
-        // Fetch ratings and reviews for a specific user
-        function FetchRatingsReviews(tableUsername) {
-            console.log("Fetching reviews for user:", tableUsername);
-
+        // Function to fetch and display reviews for a specific place
+        function FetchAndDisplayReviews(placeName) {
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/json");
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleRatingsReviewsResponse(request.responseText);
+                    HandleReviewsResponse(request.responseText);
                 }
             };
 
             var fetchReviewsRequest = {
                 type: "fetch_ratings_reviews",
-                table_id: tableUsername // Use the selected user's username as table_id
+                placeName: placeName // Use placeName instead of table_id
             };
 
             request.send(JSON.stringify(fetchReviewsRequest));
         }
 
-        // Handle the response for fetching ratings and reviews
-        function HandleRatingsReviewsResponse(response) {
+        // Handle the response for fetching reviews
+        function HandleReviewsResponse(response) {
             try {
                 var data = JSON.parse(response);
 
@@ -224,6 +222,11 @@
 
             request.send(JSON.stringify(logoutRequest));
         }
+
+        // Automatically load reviews when the page loads
+        window.onload = function () {
+            FetchReviewsTable();
+        };
     </script>
 </body>
 </html>

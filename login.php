@@ -106,27 +106,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode($response);
             break;
         
-        case 'fetch_user_info':
+        case 'fetch_all_reviews':
             $request = [
-                "type" => "fetch_user_info"
+                "type" => "fetch_all_reviews"
             ];
             $response = sendRequest($request);
             echo json_encode($response);
             break;
         
         case 'submit_rating_review':
-            if (!isset($data['user_id']) || !isset($data['table_id']) || !isset($data['rating']) || !isset($data['review'])) {
+            if (!isset($data['username']) || !isset($data['placeName']) || !isset($data['rating']) || !isset($data['review'])) {
                 echo json_encode(["status" => "error", "message" => "Missing required fields for rating and review"]);
                 exit();
             }
 
-            // Log the request data
-            error_log("Submit rating review request: " . print_r($data, true));
-
             $request = [
                 "type" => "submit_rating_review",
-                "user_id" => $data['user_id'],
-                "table_id" => $data['table_id'],
+                "username" => $data['username'],
+                "placeName" => $data['placeName'],
                 "rating" => $data['rating'],
                 "review" => $data['review']
             ];
@@ -135,14 +132,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'fetch_ratings_reviews':
-            if (!isset($data['table_id'])) {
-                echo json_encode(["status" => "error", "message" => "Missing table_id for fetching ratings and reviews"]);
+            if (!isset($data['placeName'])) {
+                echo json_encode(["status" => "error", "message" => "Missing placeName for fetching ratings and reviews"]);
                 exit();
             }
 
             $request = [
                 "type" => "fetch_ratings_reviews",
-                "table_id" => $data['table_id']
+                "placeName" => $data['placeName']
             ];
             $response = sendRequest($request);
             echo json_encode($response);
