@@ -132,4 +132,40 @@ function doRegister($username, $password) {
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
 }
+
+// Function to handle filtering
+function doFilter($city, $keyword, $rating) {
+    global $db;
+
+    try{
+        // Print the request data received
+        echo "Received filter request: ";
+        var_dump(['city' => $city, 'keyword' => $keyword, 'rating' => $rating]);
+
+        $intrating = intval($rating);
+        $regexcity = '%'.$city.'%';
+        $regexkeyword = '%'.$keyword.'%';
+
+        // Query the review DB
+        $query = "SELECT * FROM reviews WHERE reviewRating >= :rating AND placeName LIKE :keyword AND placeAddress LIKE :city";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':city', $regexcity);
+        $stmt->bindParam(':keyword', $regexkeyword);
+        $stmt->bindParam(':rating', $intrating);
+        $stmt->execute();
+
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    }
+    catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch ratings and reviews: " . $e->getMessage()
+        ];
+    }
+
+}
+
 ?>
