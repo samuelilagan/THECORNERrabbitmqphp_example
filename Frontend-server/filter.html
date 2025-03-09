@@ -25,7 +25,7 @@
                     });
 
                     html += "</table>";
-                    document.getElementById("textResponse").innerHTML = html;
+                    document.getElementById("reviewsResponse").innerHTML = html;
                 } else {
                     document.getElementById("textResponse").innerHTML = "Error: " + data.message;
                 }
@@ -91,8 +91,10 @@
     </form>
     <br>
 
-    <!-- <h2>Session Validation</h2>
-    <button onclick="CheckSession()">Check if Logged In</button> -->
+    <h2>Reviews</h2>
+    <div id="reviewsResponse">
+        <!-- Reviews will be displayed here -->
+    </div>
 
     <div id="textResponse">
         Awaiting response...
