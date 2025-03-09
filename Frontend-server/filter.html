@@ -3,29 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Corner Table</title>
-    <!-- script>
+    <title>Restaurant Filter</title>
+    <script>
+
         // Handle server responses
-        function HandleLoginResponse(response) {
+        function HandleFilterResponse(response) {
             try {
-                // Log the raw response for debugging
-                // 
-                console.log("Server Response: ", response);
+                var data = JSON.parse(response);
 
-                // Try to parse the response as JSON
-                var text = JSON.parse(response);
+                if (data.status === "success") {
+                    var users = data.users;
+                    var html = "<h3>Recommendations:</h3><table border='1'><tr><th>Place Name</th><th>Place Address</th><th>Review Rating</th><th>Author Name</th></tr>";
 
-                // Check if login is successful
-                if (text.status === "success" && text.redirect) {
-                    // Store the session token in sessionStorage
-                    sessionStorage.setItem('sessionToken', text.sessionToken);
-                    window.location.href = text.redirect;
-                    
+                    users.forEach(function (user) {
+                        html += `<tr>
+                            <td>${reviews.placeName}</td>
+                            <td>${reviews.placeAddress}</td>
+                            <td>${reviews.reviewRating}</td>
+                            <td>${reviews.authorName}</td>
+                        </tr>`;
+                    });
+
+                    html += "</table>";
+                    document.getElementById("textResponse").innerHTML = html;
                 } else {
-                    document.getElementById("textResponse").innerHTML = "Response: " + text.message + "<p>";
+                    document.getElementById("textResponse").innerHTML = "Error: " + data.message;
                 }
             } catch (e) {
-                // If there's a parsing error, display the raw response to help debug
                 document.getElementById("textResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
             }
         }
@@ -34,13 +38,15 @@
         function SendFilterRequest(event) {
             event.preventDefault(); // Prevent the default form submission
 
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
+            var city = document.getElementById("city").value;
+            var keyword = document.getElementById("keyword").value;
+            var rating = document.getElementsByName("rating").value;
 
-            var loginRequest = {
-                type: "login",  // Specify the request type
-                username: username,
-                password: password
+            var filterRequest = {
+                type: "filter",  // Specify the request type for registration
+                city: city,
+                keyword: keyword,
+                rating: rating
             };
 
             var request = new XMLHttpRequest();
@@ -49,40 +55,15 @@
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleLoginResponse(request.responseText);
+                    HandleFilterResponse(request.responseText);
                 }
             };
 
-            request.send(JSON.stringify(loginRequest));
+            request.send(JSON.stringify(filterRequest));
         }
 
-        // Send registration request
-        function SendRegistrationRequest(event) {
-            event.preventDefault(); // Prevent the default form submission
 
-            var username = document.getElementById("regUsername").value;
-            var password = document.getElementById("regPassword").value;
-
-            var registerRequest = {
-                type: "register",  // Specify the request type for registration
-                username: username,
-                password: password
-            };
-
-            var request = new XMLHttpRequest();
-            request.open("POST", "login.php", true);
-            request.setRequestHeader("Content-Type", "application/json");
-
-            request.onreadystatechange = function () {
-                if (request.readyState == 4 && request.status == 200) {
-                    HandleLoginResponse(request.responseText);
-                }
-            };
-
-            request.send(JSON.stringify(registerRequest));
-        }
-
-    </script -->
+    </script>
 </head>
 <body>
     <h1>The Corner Table</h1>
@@ -95,16 +76,17 @@
         <label for="keyword">Keyword: </label>
         <input type="text" id="keyword" name="keyword" required>
         <p>Minimum Rating: </p>
-        <input type="radio" id="one" value="1">
+        <input type="radio" id="one" name="rating" value="1">
         <label for="one">1  </label>
-        <input type="radio" id="two" value="2">
+        <input type="radio" id="two" name="rating" value="2">
         <label for="two">2  </label>
-        <input type="radio" id="three" value="3">
+        <input type="radio" id="three" name="rating" value="3">
         <label for="three">3  </label>
-        <input type="radio" id="four" value="4">
+        <input type="radio" id="four" name="rating" value="4">
         <label for="four">4  </label>
-        <input type="radio" id="five" value="5">
+        <input type="radio" id="five" name="rating" value="5">
         <label for="five">5  </label>
+        <br>
         <input type="submit" value="Filter">
     </form>
     <br>
