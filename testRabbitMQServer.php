@@ -22,13 +22,13 @@ function requestProcessor($request)
             return doLogout($request['sessionToken']);
         case "register":
             return doRegister($request['username'], $request['password']);
-        case "fetch_user_info":
-            return fetchUserInfo();
+        case "fetch_all_reviews":
+            return fetchAllReviews();
         
         case "submit_rating_review":
-            return submitRatingReview($request['user_id'], $request['table_id'], $request['rating'], $request['review']);
+            return submitRatingReview($request['username'], $request['placeName'], $request['rating'], $request['review']);
         case "fetch_ratings_reviews":
-            return fetchRatingsReviews($request['table_id']);
+            return fetchRatingsReviews($request['placeName']);
 
         default:
             return ["status" => "error", "message" => "Invalid request type"];

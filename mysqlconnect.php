@@ -140,29 +140,31 @@ function doRegister($username, $password) {
     }
 }
 
-// Function to fetch the user_info table
-function fetchUserInfo() {
+// Function to fetch all reviews
+function fetchAllReviews() {
     global $db;
 
     try {
-        $query = "SELECT id, username, created_at FROM user_info";
-        $stmt = $db->query($query);
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Fetch all reviews from the reviews table
+        $query = "SELECT * FROM reviews";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
             "status" => "success",
-            "users" => $users
+            "reviews" => $reviews
         ];
     } catch (PDOException $e) {
         return [
             "status" => "error",
-            "message" => "Failed to fetch user info: " . $e->getMessage()
+            "message" => "Failed to fetch reviews: " . $e->getMessage()
         ];
     }
 }
 
 // Function to submit a rating and review
-function submitRatingReview($username, $tableUsername, $rating, $review) {
+function submitRatingReview($username, $placeName, $rating, $review) {
     global $db;
 
     // Validate rating
@@ -172,10 +174,10 @@ function submitRatingReview($username, $tableUsername, $rating, $review) {
 
     try {
         // Insert the rating and review into the ratings_reviews table
-        $query = "INSERT INTO ratings_reviews (user_id, table_id, rating, review) VALUES (:user_id, :table_id, :rating, :review)";
+        $query = "INSERT INTO ratings_reviews (username, placeName, rating, review) VALUES (:username, :placeName, :rating, :review)";
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':user_id', $username);
-        $stmt->bindParam(':table_id', $tableUsername);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':placeName', $placeName);
         $stmt->bindParam(':rating', $rating);
         $stmt->bindParam(':review', $review);
         $stmt->execute();
@@ -193,18 +195,18 @@ function submitRatingReview($username, $tableUsername, $rating, $review) {
 }
 
 // Function to fetch ratings and reviews for a specific table
-function fetchRatingsReviews($tableUsername) {
+function fetchRatingsReviews($placeName) {
     global $db;
 
     try {
-        // Fetch ratings and reviews for the specified table_id
+        // Fetch ratings and reviews for the specified placeName
         $query = "SELECT r.rating, r.review, r.created_at, u.username 
                   FROM ratings_reviews r 
-                  JOIN user_info u ON r.user_id = u.username 
-                  WHERE r.table_id = :table_id 
+                  JOIN user_info u ON r.username = u.username 
+                  WHERE r.placeName = :placeName 
                   ORDER BY r.created_at DESC";
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':table_id', $tableUsername);
+        $stmt->bindParam(':placeName', $placeName);
         $stmt->execute();
         $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -219,4 +221,5 @@ function fetchRatingsReviews($tableUsername) {
         ];
     }
 }
+
 ?>
