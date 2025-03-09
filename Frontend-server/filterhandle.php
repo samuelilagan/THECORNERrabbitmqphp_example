@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($data['type']) {
 
         case 'filter':
-            if (!isset($data['city']) || !isset($data['keyword']) || !isset($data['rating'])) {
+            if (!isset($data['city']) || !isset($data['keyword'])) {
                 echo json_encode(["status" => "error", "message" => "Missing filter information"]);
                 exit();
             }
