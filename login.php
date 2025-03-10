@@ -145,6 +145,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode($response);
             break;
 
+        case 'filter_reviews_by_restaurant':
+            if (!isset($data['placeName'])) {
+                echo json_encode(["status" => "error", "message" => "Missing placeName for filtering reviews"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "filter_reviews_by_restaurant",
+                "placeName" => $data['placeName']
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
+
         default:
             echo json_encode(["status" => "error", "message" => "Invalid request type"]);
     }

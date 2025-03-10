@@ -13,6 +13,12 @@
 
     <a href="filter.html"><h2></h2></a>
 
+    <h2>Filter Restaurants</h2>
+    <select id="filterRestaurant">
+        <!-- Options will be populated by JavaScript -->
+    </select>
+    <button onclick="FilterReviewsByRestaurant()">Filter</button>
+
     <h2>Reviews Table</h2>
     <button onclick="FetchReviewsTable()">Load Reviews Table</button>
     <div id="reviewsTableResponse">
@@ -52,7 +58,7 @@
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleReviewsTableResponse(request.responseText);
+                    HandleReviewsResponse(request.responseText); // Handle the response
                 }
             };
 
@@ -63,7 +69,36 @@
             request.send(JSON.stringify(fetchReviewsRequest));
         }
 
-        function HandleReviewsTableResponse(response) {
+        // Function to filter reviews by restaurant
+        function FilterReviewsByRestaurant() {
+            var selectedRestaurant = document.getElementById("filterRestaurant").value;
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    var data = JSON.parse(request.responseText);
+
+                    if (data.status === "success") {
+                        FilterReviewsTable(data.tables); // Update the table with filtered data
+                    } else {
+                        document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
+                    }
+                }
+            };
+
+            var filterRequest = {
+                type: "filter_reviews_by_restaurant",
+                placeName: selectedRestaurant
+            };
+
+            request.send(JSON.stringify(filterRequest));
+        }
+
+        // Function to handle the response for reviews
+        function HandleReviewsResponse(response) {
             try {
                 var data = JSON.parse(response);
 
@@ -80,7 +115,17 @@
                         }
                     });
 
-                    // Display unique placeNames in a dropdown
+                    // Populate the Filter Restaurants dropdown
+                    var filterDropdown = document.getElementById("filterRestaurant");
+                    filterDropdown.innerHTML = ""; // Clear existing options
+                    uniquePlaceNames.forEach(function (place) {
+                        var option = document.createElement("option");
+                        option.value = place.placeName;
+                        option.text = place.placeName;
+                        filterDropdown.appendChild(option);
+                    });
+
+                    // Populate the Rate and Review dropdown
                     var placeDropdown = document.getElementById("placeName");
                     placeDropdown.innerHTML = ""; // Clear existing options
                     uniquePlaceNames.forEach(function (place) {
@@ -91,29 +136,34 @@
                     });
 
                     // Display the reviews table
-                    var html = "<h3>Reviews Table:</h3><table border='1'><tr><th>ID</th><th>Place Name</th><th>Place Address</th><th>Provider</th><th>Review Text</th><th>Review Date</th><th>Review Rating</th><th>Author Name</th></tr>";
-
-                    reviews.forEach(function (review) {
-                        html += `<tr>
-                            <td>${review.id}</td>
-                            <td>${review.placeName}</td>
-                            <td>${review.placeAddress}</td>
-                            <td>${review.provider}</td>
-                            <td>${review.reviewText}</td>
-                            <td>${review.reviewDate}</td>
-                            <td>${review.reviewRating}</td>
-                            <td>${review.authorName}</td>
-                        </tr>`;
-                    });
-
-                    html += "</table>";
-                    document.getElementById("reviewsTableResponse").innerHTML = html;
+                    FilterReviewsTable(reviews);
                 } else {
                     document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
                 }
             } catch (e) {
                 document.getElementById("reviewsTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
             }
+        }
+
+        // Function to display the reviews table
+        function FilterReviewsTable(reviews) {
+            var html = "<h3>Reviews Table:</h3><table border='1'><tr><th>ID</th><th>Place Name</th><th>Place Address</th><th>Provider</th><th>Review Text</th><th>Review Date</th><th>Review Rating</th><th>Author Name</th></tr>";
+
+            reviews.forEach(function (review) {
+                html += `<tr>
+                    <td>${review.id}</td>
+                    <td>${review.placeName}</td>
+                    <td>${review.placeAddress}</td>
+                    <td>${review.provider}</td>
+                    <td>${review.reviewText}</td>
+                    <td>${review.reviewDate}</td>
+                    <td>${review.reviewRating}</td>
+                    <td>${review.authorName}</td>
+                </tr>`;
+            });
+
+            html += "</table>";
+            document.getElementById("reviewsTableResponse").innerHTML = html;
         }
 
         // Submit a rating and review
@@ -165,7 +215,7 @@
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleReviewsResponse(request.responseText);
+                    HandleRatingsReviewsResponse(request.responseText);
                 }
             };
 
@@ -178,7 +228,7 @@
         }
 
         // Handle the response for fetching reviews
-        function HandleReviewsResponse(response) {
+        function HandleRatingsReviewsResponse(response) {
             try {
                 var data = JSON.parse(response);
 
@@ -199,6 +249,7 @@
                 document.getElementById("reviewsResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
             }
         }
+
 
         // Logout function
         function SendLogoutRequest() {
