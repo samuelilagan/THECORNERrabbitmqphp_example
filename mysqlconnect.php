@@ -222,4 +222,28 @@ function fetchRatingsReviews($placeName) {
     }
 }
 
+// Function to filter tables by restaurant
+function fetchReviewsByRestaurant($placeName) {
+    global $db;
+
+    try {
+        // Fetch reviews for the specified placeName
+        $query = "SELECT * FROM reviews WHERE placeName = :placeName";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':placeName', $placeName);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "tables" => $reviews // Ensure this matches the key used in the JavaScript
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to filter reviews: " . $e->getMessage()
+        ];
+    }
+}
+
 ?>

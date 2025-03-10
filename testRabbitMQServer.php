@@ -29,7 +29,10 @@ function requestProcessor($request)
             return submitRatingReview($request['username'], $request['placeName'], $request['rating'], $request['review']);
         case "fetch_ratings_reviews":
             return fetchRatingsReviews($request['placeName']);
-
+        
+        case "filter_reviews_by_restaurant":
+            return fetchReviewsByRestaurant($request['placeName']);
+            
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }
