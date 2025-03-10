@@ -153,6 +153,7 @@ function doFilter($city, $keyword, $rating) {
         $stmt->bindParam(':keyword', $regexkeyword);
         $stmt->bindParam(':rating', $intrating);
         $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
             "status" => "success",
