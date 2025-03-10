@@ -246,4 +246,85 @@ function fetchReviewsByRestaurant($placeName) {
     }
 }
 
+// Function to handle filtering
+function doFilter($city, $keyword, $rating, $dietary, $cuisine) {
+    global $db;
+ 
+ 
+    try {
+        // Initialize base query
+        $query = "
+            SELECT DISTINCT r.*
+            FROM reviews r
+            LEFT JOIN restaurant_dietary rd ON r.id = rd.restaurant_id
+            LEFT JOIN dietary_options d ON rd.dietary_id = d.id
+            LEFT JOIN restaurant_cuisine rc ON r.id = rc.restaurant_id
+            LEFT JOIN cuisines c ON rc.cuisine_id = c.id
+            WHERE 1=1
+        ";
+ 
+ 
+        // Initialize parameters array
+        $params = [];
+ 
+ 
+        // Add city filter if provided
+        if (!empty($city)) {
+            $query .= " AND r.placeAddress LIKE :city";
+            $params[':city'] = '%' . $city . '%';
+        }
+ 
+ 
+        // Add keyword filter if provided
+        if (!empty($keyword)) {
+            $query .= " AND r.placeName LIKE :keyword";
+            $params[':keyword'] = '%' . $keyword . '%';
+        }
+ 
+ 
+        // Add rating filter if provided
+        if (!empty($rating)) {
+            $query .= " AND r.reviewRating = :rating";
+            $params[':rating'] = intval($rating);
+        }
+ 
+ 
+        // Add dietary filter if provided
+        if (!empty($dietary)) {
+            $query .= " AND d.option_name = :dietary";
+            $params[':dietary'] = $dietary;
+        }
+ 
+ 
+        // Add cuisine filter if provided
+        if (!empty($cuisine)) {
+            $query .= " AND c.cuisine_name = :cuisine";
+            $params[':cuisine'] = $cuisine;
+        }
+ 
+ 
+        // Prepare and execute the query
+        $stmt = $db->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+ 
+ 
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ 
+ 
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch filtered reviews: " . $e->getMessage()
+        ];
+    }
+ }
+ 
+
 ?>

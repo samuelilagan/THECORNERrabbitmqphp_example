@@ -32,7 +32,21 @@ function requestProcessor($request)
         
         case "filter_reviews_by_restaurant":
             return fetchReviewsByRestaurant($request['placeName']);
-            
+        
+        case "filter":
+           // Ensure required fields are present
+           if (!isset($request['city']) || !isset($request['keyword']) || !isset($request['rating'])) {
+               return ["status" => "error", "message" => "Missing filter information"];
+           }
+           // Pass all filters to doFilter (even if some are empty)
+           return doFilter(
+               $request['city'] ?? '',
+               $request['keyword'] ?? '',
+               $request['rating'] ?? '',
+               $request['dietary'] ?? '',
+               $request['cuisine'] ?? ''
+           );
+
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }
@@ -40,6 +54,7 @@ function requestProcessor($request)
 
 // Start the RabbitMQ server to process requests
 $server = new rabbitMQServer("localRabbitMQ.ini", "testServer");
+// $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests('requestProcessor');
 exit();
 ?>
