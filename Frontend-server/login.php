@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode([
                     "status" => "success",
                     "sessionToken" => $response['sessionToken'],
+                    "username" => $response['username'], // Forward the username
                     "redirect" => "home.html"  // Indicate the redirect target
                 ]);
                 exit();
@@ -101,6 +102,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $response = sendRequest($request);
 
+            echo json_encode($response);
+            break;
+        
+        case 'fetch_all_reviews':
+            $request = [
+                "type" => "fetch_all_reviews"
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
+        
+        case 'submit_rating_review':
+            if (!isset($data['username']) || !isset($data['placeName']) || !isset($data['rating']) || !isset($data['review'])) {
+                echo json_encode(["status" => "error", "message" => "Missing required fields for rating and review"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "submit_rating_review",
+                "username" => $data['username'],
+                "placeName" => $data['placeName'],
+                "rating" => $data['rating'],
+                "review" => $data['review']
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
+
+        case 'fetch_ratings_reviews':
+            if (!isset($data['placeName'])) {
+                echo json_encode(["status" => "error", "message" => "Missing placeName for fetching ratings and reviews"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "fetch_ratings_reviews",
+                "placeName" => $data['placeName']
+            ];
+            $response = sendRequest($request);
+            echo json_encode($response);
+            break;
+
+        case 'filter_reviews_by_restaurant':
+            if (!isset($data['placeName'])) {
+                echo json_encode(["status" => "error", "message" => "Missing placeName for filtering reviews"]);
+                exit();
+            }
+
+            $request = [
+                "type" => "filter_reviews_by_restaurant",
+                "placeName" => $data['placeName']
+            ];
+            $response = sendRequest($request);
             echo json_encode($response);
             break;
 

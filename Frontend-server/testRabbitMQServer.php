@@ -24,6 +24,14 @@ function requestProcessor($request)
             return doRegister($request['username'], $request['password']);
         case "filter":
             return doFilter($request['city'], $request['keyword'], $request['rating']);
+        case "fetch_all_reviews":
+            return fetchAllReviews();       
+        case "submit_rating_review":
+            return submitRatingReview($request['username'], $request['placeName'], $request['rating'], $request['review']);
+        case "fetch_ratings_reviews":
+            return fetchRatingsReviews($request['placeName']);        
+        case "filter_reviews_by_restaurant":
+            return fetchReviewsByRestaurant($request['placeName']);
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }

@@ -36,7 +36,8 @@ function doLogin($username, $password) {
         return [
             "status" => "success",
             "message" => "Already logged in",
-            "sessionToken" => $_SESSION['sessionToken']
+            "sessionToken" => $_SESSION['sessionToken'],
+            "username" => $_SESSION['username'] // Return the username
         ];
     }
 
@@ -47,13 +48,18 @@ function doLogin($username, $password) {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Debug: Print the user data fetched from the database
+    echo "User data from database: ";
+    var_dump($user);
+
     if ($user && password_verify($password, $user['password'])) {
         // Generate a new session token
         $sessionToken = generateSessionToken();
         $_SESSION['sessionToken'] = $sessionToken; // Store session token in session
-        
+        $_SESSION['username'] = $username; // Store username in session
+
         // Optionally update the session token in the database
-        $expiry = time() + (60 * 60); // expiration is 1 hour, can change based on needs
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bindParam(':sessionToken', $sessionToken);
@@ -64,7 +70,8 @@ function doLogin($username, $password) {
         return [
             "status" => "success",
             "message" => "Login successful",
-            "sessionToken" => $sessionToken
+            "sessionToken" => $sessionToken,
+            "username" => $username // Return the username
         ];
     } else {
         return [
@@ -167,6 +174,112 @@ function doFilter($city, $keyword, $rating) {
         ];
     }
 
+}
+
+// Function to fetch all reviews
+function fetchAllReviews() {
+    global $db;
+
+    try {
+        // Fetch all reviews from the reviews table
+        $query = "SELECT * FROM reviews";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch reviews: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to submit a rating and review
+function submitRatingReview($username, $placeName, $rating, $review) {
+    global $db;
+
+    // Validate rating
+    if ($rating < 1 || $rating > 5) {
+        return ["status" => "error", "message" => "Rating must be between 1 and 5"];
+    }
+
+    try {
+        // Insert the rating and review into the ratings_reviews table
+        $query = "INSERT INTO ratings_reviews (username, placeName, rating, review) VALUES (:username, :placeName, :rating, :review)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':placeName', $placeName);
+        $stmt->bindParam(':rating', $rating);
+        $stmt->bindParam(':review', $review);
+        $stmt->execute();
+
+        return [
+            "status" => "success",
+            "message" => "Rating and review submitted successfully"
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to submit rating and review: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to fetch ratings and reviews for a specific table
+function fetchRatingsReviews($placeName) {
+    global $db;
+
+    try {
+        // Fetch ratings and reviews for the specified placeName
+        $query = "SELECT r.rating, r.review, r.created_at, u.username 
+                  FROM ratings_reviews r 
+                  JOIN user_info u ON r.username = u.username 
+                  WHERE r.placeName = :placeName 
+                  ORDER BY r.created_at DESC";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':placeName', $placeName);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch ratings and reviews: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to filter tables by restaurant
+function fetchReviewsByRestaurant($placeName) {
+    global $db;
+
+    try {
+        // Fetch reviews for the specified placeName
+        $query = "SELECT * FROM reviews WHERE placeName = :placeName";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':placeName', $placeName);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "tables" => $reviews // Ensure this matches the key used in the JavaScript
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to filter reviews: " . $e->getMessage()
+        ];
+    }
 }
 
 ?>
