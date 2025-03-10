@@ -147,7 +147,7 @@ function doFilter($city, $keyword, $rating) {
         $regexkeyword = '%'.$keyword.'%';
 
         // Query the review DB
-        $query = "SELECT * FROM reviews WHERE reviewRating >= :rating AND placeName LIKE :keyword AND placeAddress LIKE :city";
+        $query = "SELECT * FROM reviews WHERE reviewRating >= :rating AND reviewText LIKE :keyword AND placeAddress LIKE :city";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':city', $regexcity);
         $stmt->bindParam(':keyword', $regexkeyword);
