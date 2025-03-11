@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "express": "^4.21.2",
+    "notificationapi-node-server-sdk": "^2.3.0"
+  }
+}
