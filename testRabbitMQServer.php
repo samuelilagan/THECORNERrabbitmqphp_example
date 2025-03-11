@@ -22,6 +22,31 @@ function requestProcessor($request)
             return doLogout($request['sessionToken']);
         case "register":
             return doRegister($request['username'], $request['password']);
+        case "fetch_all_reviews":
+            return fetchAllReviews();
+        
+        case "submit_rating_review":
+            return submitRatingReview($request['username'], $request['placeName'], $request['rating'], $request['review']);
+        case "fetch_ratings_reviews":
+            return fetchRatingsReviews($request['placeName']);
+        
+        case "filter_reviews_by_restaurant":
+            return fetchReviewsByRestaurant($request['placeName']);
+        
+        case "filter":
+           // Ensure required fields are present
+           if (!isset($request['city']) || !isset($request['keyword']) || !isset($request['rating'])) {
+               return ["status" => "error", "message" => "Missing filter information"];
+           }
+           // Pass all filters to doFilter (even if some are empty)
+           return doFilter(
+               $request['city'] ?? '',
+               $request['keyword'] ?? '',
+               $request['rating'] ?? '',
+               $request['dietary'] ?? '',
+               $request['cuisine'] ?? ''
+           );
+
         default:
             return ["status" => "error", "message" => "Invalid request type"];
     }
@@ -29,6 +54,7 @@ function requestProcessor($request)
 
 // Start the RabbitMQ server to process requests
 $server = new rabbitMQServer("localRabbitMQ.ini", "testServer");
+// $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests('requestProcessor');
 exit();
 ?>
