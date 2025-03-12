@@ -4,8 +4,12 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Database connection settings 
-$dsn = 'mysql:host=127.0.0.1;dbname=users';
+// Database connection settings (need to change this for using on other systems)
+// $dsn = 'mysql:host=127.0.0.1;dbname=users';
+$dsn = 'mysql:host=148.77.110.18;dbname=users'; 
+// Since you are connected through a VPN, use the VPN IP address of the VM hosting 
+// the database in mysqlconnect.php:
+// $dsn = 'mysql:host=VPN_IP_ADDRESS;dbname=users';
 $dbUser = 'testUser';
 $dbPassword = '12345';
 
@@ -59,7 +63,7 @@ function doLogin($username, $password) {
         $_SESSION['username'] = $username; // Store username in session
 
         // Optionally update the session token in the database
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $expiry = time() + (60 * 60); // expiration is 1 hour, can change based on needs
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bindParam(':sessionToken', $sessionToken);
@@ -138,42 +142,6 @@ function doRegister($username, $password) {
     } catch (PDOException $e) {
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
-}
-
-// Function to handle filtering
-function doFilter($city, $keyword, $rating) {
-    global $db;
-
-    try{
-        // Print the request data received
-        echo "Received filter request: ";
-        var_dump(['city' => $city, 'keyword' => $keyword, 'rating' => $rating]);
-
-        $intrating = intval($rating);
-        $regexcity = '%'.$city.'%';
-        $regexkeyword = '%'.$keyword.'%';
-
-        // Query the review DB
-        $query = "SELECT * FROM reviews WHERE reviewRating >= :rating AND reviewText LIKE :keyword AND placeAddress LIKE :city";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':city', $regexcity);
-        $stmt->bindParam(':keyword', $regexkeyword);
-        $stmt->bindParam(':rating', $intrating);
-        $stmt->execute();
-        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return [
-            "status" => "success",
-            "reviews" => $reviews
-        ];
-    }
-    catch (PDOException $e) {
-        return [
-            "status" => "error",
-            "message" => "Failed to fetch ratings and reviews: " . $e->getMessage()
-        ];
-    }
-
 }
 
 // Function to fetch all reviews
@@ -281,5 +249,86 @@ function fetchReviewsByRestaurant($placeName) {
         ];
     }
 }
+
+// Function to handle filtering
+function doFilter($city, $keyword, $rating, $dietary, $cuisine) {
+    global $db;
+ 
+ 
+    try {
+        // Initialize base query
+        $query = "
+            SELECT DISTINCT r.*
+            FROM reviews r
+            LEFT JOIN restaurant_dietary rd ON r.id = rd.restaurant_id
+            LEFT JOIN dietary_options d ON rd.dietary_id = d.id
+            LEFT JOIN restaurant_cuisine rc ON r.id = rc.restaurant_id
+            LEFT JOIN cuisines c ON rc.cuisine_id = c.id
+            WHERE 1=1
+        ";
+ 
+ 
+        // Initialize parameters array
+        $params = [];
+ 
+ 
+        // Add city filter if provided
+        if (!empty($city)) {
+            $query .= " AND r.placeAddress LIKE :city";
+            $params[':city'] = '%' . $city . '%';
+        }
+ 
+ 
+        // Add keyword filter if provided
+        if (!empty($keyword)) {
+            $query .= " AND r.placeName LIKE :keyword";
+            $params[':keyword'] = '%' . $keyword . '%';
+        }
+ 
+ 
+        // Add rating filter if provided
+        if (!empty($rating)) {
+            $query .= " AND r.reviewRating = :rating";
+            $params[':rating'] = intval($rating);
+        }
+ 
+ 
+        // Add dietary filter if provided
+        if (!empty($dietary)) {
+            $query .= " AND d.option_name = :dietary";
+            $params[':dietary'] = $dietary;
+        }
+ 
+ 
+        // Add cuisine filter if provided
+        if (!empty($cuisine)) {
+            $query .= " AND c.cuisine_name = :cuisine";
+            $params[':cuisine'] = $cuisine;
+        }
+ 
+ 
+        // Prepare and execute the query
+        $stmt = $db->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+ 
+ 
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ 
+ 
+        return [
+            "status" => "success",
+            "reviews" => $reviews
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch filtered reviews: " . $e->getMessage()
+        ];
+    }
+ }
+ 
 
 ?>
