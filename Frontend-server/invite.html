@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>You're Invited</title>
+</head>
+<body>
+   <h2>You're Invited!</h2>
+   <p>Join us at <strong id="restaurantName">[Restaurant Name]</strong> on
+      <strong id="reservationDate">[Date]</strong> at
+      <strong id="reservationTime">[Time]</strong>.
+   </p>
+
+
+   <h3>RSVP</h3>
+   <button onclick="confirmAttendance()">✔️ I'm Going!</button>
+
+
+   <h3>Invite Friends</h3>
+   <p>Send this link to your friends:</p>
+   <input type="text" id="inviteLink" readonly style="width: 100%;" />
+   <button onclick="copyLink()">Copy Link</button>
+
+
+   <h3>Add to Calendar</h3>
+   <p><a href="#" id="googleCalendarLink" target="_blank">➕ Add to Google Calendar</a></p>
+
+
+   <h3>People Attending:</h3>
+   <ul id="attendeesList"></ul>
+
+
+   <script>
+       const urlParams = new URLSearchParams(window.location.search);
+       const restaurant = urlParams.get("restaurant") || "Unknown Restaurant";
+       const date = urlParams.get("date") || "Unknown Date";
+       const time = urlParams.get("time") || "Unknown Time";
+
+
+       document.getElementById("restaurantName").textContent = restaurant;
+       document.getElementById("reservationDate").textContent = date;
+       document.getElementById("reservationTime").textContent = time;
+
+
+       const inviteUrl = window.location.href;
+       document.getElementById("inviteLink").value = inviteUrl;
+
+
+       function copyLink() {
+           const linkField = document.getElementById("inviteLink");
+           linkField.select();
+           document.execCommand("copy");
+           alert("Invite link copied!");
+       }
+
+
+       function confirmAttendance() {
+           const name = prompt("Enter your name to confirm attendance:");
+           if (name) {
+               let attendees = JSON.parse(localStorage.getItem("attendees")) || [];
+               attendees.push(name);
+               localStorage.setItem("attendees", JSON.stringify(attendees));
+               displayAttendees();
+           }
+       }
+
+
+       function displayAttendees() {
+           const attendees = JSON.parse(localStorage.getItem("attendees")) || [];
+           const list = document.getElementById("attendeesList");
+           list.innerHTML = attendees.map(name => `<li>${name}</li>`).join("");
+       }
+
+
+       displayAttendees();
+
+
+       if (date !== "Unknown Date" && time !== "Unknown Time") {
+           const startDateTime = new Date(`${date}T${time}`).toISOString().replace(/-|:|\.\d+/g, "");
+           const endDateTime = new Date(new Date(`${date}T${time}`).getTime() + 3600000).toISOString().replace(/-|:|\.\d+/g, "");
+           const googleCalendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=Dinner at ${encodeURIComponent(restaurant)}&dates=${startDateTime}/${endDateTime}&details=You're invited to dinner at ${encodeURIComponent(restaurant)}!&location=${encodeURIComponent(restaurant)}&sf=true&output=xml`;
+           document.getElementById("googleCalendarLink").setAttribute("href", googleCalendarLink);
+       }
+   </script>
+</body>
+</html>
