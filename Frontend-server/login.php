@@ -3,11 +3,12 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 session_start();
 
 function sendRequest($request) {
-    // $client = new rabbitMQClient('localRabbitMQ.ini', 'testServer');
     $client = new rabbitMQClient('testRabbitMQ.ini', 'testServer');
     try {
         $response = $client->send_request($request);
