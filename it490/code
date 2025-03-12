@@ -1,0 +1,25 @@
+<?php
+
+require_once 'vendor/autoload.php';
+
+use NotificationAPI\NotificationAPI;
+
+$notificationapi = new NotificationAPI(
+  'nysaalf6rdm6jyg8pla5si4cju', // clientId
+  'xvsjcir9jktvmud6vtlpxnon8j217eh3uufighc0gcjlaw8uh9rdw815i9' // clientSecret
+);
+
+$notificationapi->send([
+  "notificationId" => "test",
+  "user" => [
+    "id" => "aap48@njit.edu",
+    "email" => "aap48@njit.edu",
+    "number" => "+19737180123" // Replace with your phone number, use format [+][country code][area code][local number]
+  ],
+  "mergeTags" => [
+    "comment" => "testComment",
+    "commentId" => "testCommentId"
+  ]
+]);
+?>
+

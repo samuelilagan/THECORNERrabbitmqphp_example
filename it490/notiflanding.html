@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Home Page</title>
+</head>
+<body>
+   <h1>Welcome to The Corner Table!</h1>
+
+
+   <script  src="app.js"></script> 
+
+   <h2>User Information</h2>
+   <p>Welcome, <span id="username">Guest</span>!</p>
+
+
+   <br> 
+
+   <h6>You have been signed up for notification!</h6>
+
+
+
+
+   <a href="filter.html"><h2></h2></a>
+
+
+
+
+   <h2>Logout</h2>
+   <button onclick="logout()">Logout</button>
+
+
+  
+
+   <script>
+       // Logout function hi
+       function logout() {
+           var request = new XMLHttpRequest();
+           request.open("POST", "login.php", true);
+           request.setRequestHeader("Content-Type", "application/json");
+
+
+
+
+           var logoutRequest = {
+               type: "logout"
+           };
+
+
+
+
+           request.onreadystatechange = function() {
+               if (request.readyState == 4 && request.status == 200) {
+                   var response = JSON.parse(request.responseText);
+                   if (response.status === "success") {
+                       // Redirect to login page after successful logout
+                       window.location.href = "index.html";
+                   }
+               }
+           };
+           request.send(JSON.stringify(logoutRequest));
+       }
+   </script>
+</body>
+</html>
