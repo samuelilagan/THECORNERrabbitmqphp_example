@@ -1,103 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Filter</title>
-    <script>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Restaurant Filter</title>
+   <script>
+       // Handle server responses
+       function HandleFilterResponse(response) {
+           try {
+               var data = JSON.parse(response);
+               console.log(data); // Debugging: Log the parsed data
 
-        // Handle server responses
-        function HandleFilterResponse(response) {
-            try {
-                var data = JSON.parse(response);
 
-                if (data.status === "success") {
-                    var reviews = data.reviews;
-                    var html = "<h3>Recommendations:</h3><table border='1'><tr><th>Place Name</th><th>Place Address</th><th>Review Rating</th><th>Author Name</th></tr>";
+               if (data.status === "success") {
+                   var reviews = data.reviews;
+                   var html = "<h3>Recommendations:</h3><table border='1'><tr><th>Place Name</th><th>Place Address</th><th>Review Rating</th><th>Author Name</th></tr>";
 
-                    reviews.forEach(function (review) {
-                        html += `<tr>
-                            <td>${reviews.placeName}</td>
-                            <td>${reviews.placeAddress}</td>
-                            <td>${reviews.reviewRating}</td>
-                            <td>${reviews.authorName}</td>
-                        </tr>`;
-                    });
 
-                    html += "</table>";
-                    document.getElementById("reviewsResponse").innerHTML = html;
-                } else {
-                    document.getElementById("textResponse").innerHTML = "Error: " + data.message;
-                }
-            } catch (e) {
-                document.getElementById("textResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
-            }
-        }
+                   reviews.forEach(function (review) {
+                       html += `<tr>
+                           <td>${review.placeName}</td>
+                           <td>${review.placeAddress}</td>
+                           <td>${review.reviewRating}</td>
+                           <td>${review.authorName}</td>
+                       </tr>`;
+                   });
 
-        // Send filter request
-        function SendFilterRequest(event) {
-            event.preventDefault(); // Prevent the default form submission
 
-            var city = document.getElementById("city").value;
-            var keyword = document.getElementById("keyword").value;
-            var rating = document.getElementsByName("rating").value;
+                   html += "</table>";
+                   document.getElementById("reviewsResponse").innerHTML = html;
+               } else {
+                   document.getElementById("textResponse").innerHTML = "Error: " + data.message;
+               }
+           } catch (e) {
+               document.getElementById("textResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+           }
+       }
 
-            var filterRequest = {
-                type: "filter",  // Specify the request type for registration
-                city: city,
-                keyword: keyword,
-                rating: rating
-            };
 
+       // Send filter request
+       function SendFilterRequest(event) {
+           event.preventDefault(); // Prevent the default form submission
+
+
+           var city = document.getElementById("city").value;
+           var keyword = document.getElementById("keyword").value;
+           var rating = document.querySelector('input[name="rating"]:checked');
+           rating = rating ? rating.value : null; // Handle case where no rating is selected
+
+
+           // Get dietary and cuisine preferences
+           var dietary = document.getElementById("dietary").value;
+           var cuisine = document.getElementById("cuisine").value;
+
+
+           var filterRequest = {
+               type: "filter",  // Specify the request type for registration
+               city: city,
+               keyword: keyword,
+               rating: rating,
+               dietary: dietary,
+               cuisine: cuisine
+           };
+
+
+           var request = new XMLHttpRequest();
+           request.open("POST", "filterhandle.php", true);
+           request.setRequestHeader("Content-Type", "application/json");
+
+
+           request.onreadystatechange = function () {
+               if (request.readyState == 4 && request.status == 200) {
+                   HandleFilterResponse(request.responseText);
+               }
+           };
+
+
+           request.send(JSON.stringify(filterRequest));
+       }
+
+       // Logout function
+       function SendLogoutRequest() {
             var request = new XMLHttpRequest();
-            request.open("POST", "filterhandle.php", true);
+            request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/json");
+
+            var logoutRequest = {
+                type: "logout"
+            };
 
             request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
-                    HandleFilterResponse(request.responseText);
+                    var response = JSON.parse(request.responseText);
+                    if (response.status === "success") {
+                        // Redirect to login page after successful logout
+                        window.location.href = "index.html";
+                    }
                 }
             };
 
-            request.send(JSON.stringify(filterRequest));
+            request.send(JSON.stringify(logoutRequest));
         }
-
-
-    </script>
+   </script>
 </head>
 <body>
-    <h1>The Corner Table</h1>
-    
-    <h2>Filter for Restaurants</h2>
-    <form onsubmit="SendFilterRequest(event)">
-        <label for="city">City: </label>
-        <input type="text" id="city" name="city" required>
-        <br><br>
-        <label for="keyword">Keyword: </label>
-        <input type="text" id="keyword" name="keyword" required>
-        <p>Minimum Rating: </p>
-        <input type="radio" id="one" name="rating" value="1">
-        <label for="one">1  </label>
-        <input type="radio" id="two" name="rating" value="2">
-        <label for="two">2  </label>
-        <input type="radio" id="three" name="rating" value="3">
-        <label for="three">3  </label>
-        <input type="radio" id="four" name="rating" value="4">
-        <label for="four">4  </label>
-        <input type="radio" id="five" name="rating" value="5">
-        <label for="five">5  </label>
-        <br>
-        <input type="submit" value="Filter">
-    </form>
-    <br>
+   <h1>The Corner Table</h1>
+  
+   <h2>Filter for Restaurants</h2>
+   <form onsubmit="SendFilterRequest(event)">
+       <label for="city">City: </label>
+       <input type="text" id="city" name="city">
+       <br><br>
+       <label for="keyword">Keyword: </label>
+       <input type="text" id="keyword" name="keyword">
+       <p>Minimum Rating: </p>
+       <input type="radio" id="one" name="rating" value="1">
+       <label for="one">1  </label>
+       <input type="radio" id="two" name="rating" value="2">
+       <label for="two">2  </label>
+       <input type="radio" id="three" name="rating" value="3">
+       <label for="three">3  </label>
+       <input type="radio" id="four" name="rating" value="4">
+       <label for="four">4  </label>
+       <input type="radio" id="five" name="rating" value="5">
+       <label for="five">5  </label>
+       <br><br>
+       <label for="dietary">Dietary Restrictions: </label>
+       <select id="dietary" name="dietary">
+           <option value="">None</option>
+           <option value="vegetarian">Vegetarian</option>
+           <option value="vegan">Vegan</option>
+           <option value="gluten-free">Gluten-Free</option>
+       </select>
+       <br><br>
+       <label for="cuisine">Cuisine: </label>
+       <select id="cuisine" name="cuisine">
+           <option value="">None</option>
+           <option value="american">American</option>
+           <option value="french">French</option>
+           <option value="spanish">Spanish</option>
+           <option value="dessert">Dessert</option>
+       </select>
+       <br><br>
+       <input type="submit" value="Filter">
+   </form>
+   <br>
 
-    <h2>Reviews</h2>
-    <div id="reviewsResponse">
-        <!-- Reviews will be displayed here -->
-    </div>
 
-    <div id="textResponse">
-        Awaiting response...
-    </div>
+   <h2>Reviews</h2>
+   <div id="reviewsResponse">
+       <!-- Reviews will be displayed here -->
+   </div>
+
+   <h2>Logout</h2>
+    <button onclick="SendLogoutRequest()">Logout</button>
+
+   <div id="textResponse">
+       Awaiting response...
+   </div>
 </body>
 </html>
