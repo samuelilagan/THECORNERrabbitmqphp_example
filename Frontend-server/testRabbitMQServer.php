@@ -46,6 +46,24 @@ function requestProcessor($request)
                $request['dietary'] ?? '',
                $request['cuisine'] ?? ''
            );
+        
+        case "book_reservation":
+            if (!isset($request['restaurant']) || !isset($request['date']) || !isset($request['time'])) {
+                return ["status" => "error", "message" => "Missing reservation fields"];
+            }
+            return bookReservation(
+                $request['restaurant'],
+                $request['date'],
+                $request['time'],
+                $request['username'] ?? null
+            );
+        case "get_reservations":
+            return getReservations($request['username'] ?? null);
+        case "cancel_reservation":
+            return cancelReservation(
+                $request['reservation_id'],
+                $request['username'] ?? null
+            );
 
         default:
             return ["status" => "error", "message" => "Invalid request type"];

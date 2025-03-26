@@ -1,51 +1,64 @@
 <?php
+require_once('/home/samilagan/git/rabbitmqphp_example/path.inc');
+require_once('/home/samilagan/git/rabbitmqphp_example/get_host_info.inc');
+require_once('/home/samilagan/git/rabbitmqphp_example/rabbitMQLib.inc');
 
+// Clear any previous output
+ob_clean();
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-
-include 'rabbitMQLib.inc'; // Connection
+// Set proper headers before any output
 header('Content-Type: application/json');
 
+// Handle CORS if needed
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-   $restaurant = $_POST["restaurant"] ?? '';
-   $date = $_POST["date"] ?? '';
-   $time = $_POST["time"] ?? '';
+try {
+    // Get raw POST data
+    $input = file_get_contents('php://input');
+    if (empty($input)) {
+        throw new Exception("No input data received");
+    }
 
+    // Decode JSON input
+    $data = json_decode($input, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception("Invalid JSON input");
+    }
 
-   if (empty($restaurant) || empty($date) || empty($time)) {
-       echo json_encode(["status" => "error", "message" => "All fields are required!"]);
-       exit;
-   }
+    // Validate request type
+    if (!isset($data['type'])) {
+        throw new Exception("Missing request type");
+    }
 
+    // Add username if logged in
+    session_start();
+    if (isset($_SESSION['username'])) {
+        $data['username'] = $_SESSION['username'];
+    }
 
-   // The invite link
-   $inviteLink = "http://www.sample.com/invite.php?restaurant=" . urlencode($restaurant) . "&date=" . urlencode($date) . "&time=" . urlencode($time);
+    // Initialize RabbitMQ client
+    $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/localRabbitMQ.ini', 'testServer');
+    
+    // Send request and get response
+    $response = $client->send_request($data);
+    
+    // Ensure response is properly formatted
+    if (!is_array($response)) {
+        throw new Exception("Invalid response format from RabbitMQ");
+    }
 
+    // Output clean JSON
+    echo json_encode($response);
+    exit();
 
-   // RabbitMQ client
-   $client = new rabbitMQClient("testRabbitMQ.ini", "rabbitMQ");
-
-
-   // Reservation data
-   $request = [
-       "type" => "book_reservation",
-       "restaurant" => $restaurant,
-       "date" => $date,
-       "time" => $time
-   ];
-
-
-   // Sends to RabbitMQ
-   $response = $client->send_request($request);
-
-
-   if ($response === "success") {
-       echo json_encode(["status" => "success", "message" => "Reservation booked!", "invite_link" => $inviteLink]);
-   } else {
-       echo json_encode(["status" => "error", "message" => "Failed to book reservation."]);
-   }
+} catch (Exception $e) {
+    // Output clean error JSON
+    echo json_encode([
+        'status' => 'error',
+        'message' => $e->getMessage()
+    ]);
+    exit();
 }
 ?>
