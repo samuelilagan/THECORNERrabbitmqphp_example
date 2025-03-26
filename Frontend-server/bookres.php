@@ -1,7 +1,7 @@
 <?php
-require_once('/home/samilagan/git/rabbitmqphp_example/path.inc');
-require_once('/home/samilagan/git/rabbitmqphp_example/get_host_info.inc');
-require_once('/home/samilagan/git/rabbitmqphp_example/rabbitMQLib.inc');
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
 
 // Clear any previous output
 ob_clean();
@@ -39,7 +39,7 @@ try {
     }
 
     // Initialize RabbitMQ client
-    $client = new rabbitMQClient('/home/samilagan/git/rabbitmqphp_example/localRabbitMQ.ini', 'testServer');
+    $client = new rabbitMQClient('testRabbitMQ.ini', 'testServer');
     
     // Send request and get response
     $response = $client->send_request($data);
