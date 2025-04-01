@@ -1,28 +1,61 @@
-const { ApifyClient } = require('apify-client'); 
+require('dotenv').config();
+const { ApifyClient } = require('apify-client');
+const mysql = require('mysql2/promise');
 
-// Initialize the Apify client with your API token 
-const client = new ApifyClient({ 
-token: 'apify_api_IXZmdm4hEGcpg3bB1mYIWibqMFm0zh4AmTY7', 
-}); 
+const apifyToken = process.env.APIFY_TOKEN;
+const datasetId = "QubOQR8wBfoAMaEZQ"; // Replace with actual dataset ID
 
-(async () => { 
-try { 
-// Define input parameters for the API 
-const input = { 
-"restaurantUrls": ["https://www.yelp.com/biz/jollibee-jersey-city-7?osq=Jollibee&limit=10"], 
-"maxReviews": 10
+const dbConfig = {
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'testUser',
+    password: process.env.MYSQL_PASSWORD || '12345',
+    database: process.env.MYSQL_DATABASE || 'users'
 };
 
- // Run the Restaurant Review Aggregator actor 
-const run = await client.actor("tri_angle/restaurant-review-aggregator").call(input); 
 
-// Fetch the results from the dataset 
-const { items } = await client.dataset(run.defaultDatasetId).listItems(); 
 
-// Print the extracted reviews 
-console.log('Extracted Reviews:', items); 
-} catch (error) {
-     console.error("Error fetching reviews:", error); 
-} 
-})();
+(async () => {
+    try {
+        // Initialize Apify client
+        const client = new ApifyClient({ token: apifyToken });
+
+        // Fetch dataset records
+        const { items } = await client.dataset(datasetId).listItems();
+
+        // Connect to MySQL
+        const connection = await mysql.createConnection(dbConfig);
+
+        // Insert data into MySQL table
+        for (const reviews of items) {
+          const placeName = reviews.placeName // || "Unknown";
+          const placeAddress = reviews.placeAddress // || "Anonymous";
+          const provider = reviews.provider // || "No review text provided";
+          const reviewText = reviews.reviewText // || "No review text provided";
+          const reviewDate = reviews.reviewDate // || "No review text provided";
+          const reviewRating = reviews.reviewRating   // Allow NULL for missing ratings
+          const authorName = reviews.authorName // || new Date().toISOString().slice(0, 19).replace('T', ' '); // Default to current time
+      
+          console.log(`Inserting: ${placeName}, ${placeAddress}, ${provider}, ${reviewText}, $${reviewDate}, ${reviewRating}, ${authorName}`);
+      
+          const query = `INSERT INTO reviews (placeName, placeAddress, provider, reviewText, reviewDate, reviewRating, authorName) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+          await connection.execute(query, [placeName, placeAddress, provider, reviewText, reviewDate, reviewRating, authorName]);
+      }
+      
+
+        console.log("Data successfully inserted into MySQL!");
+        await connection.end();
+    } catch (error) {
+        console.error("Error:", error);
+    }
+
+
+    
+})
+
+
+()
+
+
+
+ 
 

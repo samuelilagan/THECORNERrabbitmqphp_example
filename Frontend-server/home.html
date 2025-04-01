@@ -11,14 +11,265 @@
     <h2>User Information</h2>
     <p>Welcome, <span id="username">Guest</span>!</p>
 
-    <a href="filter.html"><h2></h2></a>
+    <a href="filter.html"><h2>Filter for Restaurants by Preference</h2></a>
+    <a href="http://172.28.71.226:3000/"><h2>Sign Up for Test/Email Notifications</h2></a>
+    <a href="bookres.html"><h2>Book a Reservation</h2></a>
+    <a href="invite.html"><h2>Send an Invite Link</h2></a>
+
+    <h2>Filter Restaurants</h2>
+    <select id="filterRestaurant">
+        <!-- Options will be populated by JavaScript -->
+    </select>
+    <button onclick="FilterReviewsByRestaurant()">Filter</button>
+
+    <h2>Reviews Table</h2>
+    <button onclick="FetchReviewsTable()">Load Reviews Table</button>
+    <div id="reviewsTableResponse">
+        <!-- Reviews table will be displayed here -->
+    </div>
+    <div id="paginationControls">
+        <!-- Pagination controls will be displayed here -->
+    </div>
+
+    <h2>Rate and Review</h2>
+    <form id="rateAndReviewForm" onsubmit="SubmitRatingReview(event)">
+        <label for="placeName">Place Name:</label>
+        <select id="placeName" name="placeName" required>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+        <br><br>
+        <label for="rating">Rating (1-5):</label>
+        <input type="number" id="rating" name="rating" min="1" max="5" required>
+        <br><br>
+        <label for="review">Review:</label>
+        <textarea id="review" name="review" required></textarea>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Reviews</h2>
+    <div id="reviewsResponse">
+        <!-- Reviews will be displayed here -->
+    </div>
 
     <h2>Logout</h2>
-    <button onclick="logout()">Logout</button>
+    <button onclick="SendLogoutRequest()">Logout</button>
 
     <script>
-        // Logout function hi
-        function logout() {
+        var currentPage = 1;
+        var reviewsPerPage = 10; // Number of reviews per page
+        var allReviews = []; // Store all reviews
+        var filteredReviews = []; // Store filtered reviews
+
+        // Fetch and populate the reviews table
+        function FetchReviewsTable() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleReviewsResponse(request.responseText); // Handle the response
+                }
+            };
+
+            var fetchReviewsRequest = {
+                type: "fetch_all_reviews"
+            };
+
+            request.send(JSON.stringify(fetchReviewsRequest));
+        }
+
+        // Function to filter reviews by restaurant
+        function FilterReviewsByRestaurant() {
+            var selectedRestaurant = document.getElementById("filterRestaurant").value;
+
+            // Filter reviews based on the selected restaurant
+            filteredReviews = allReviews.filter(function (review) {
+                return review.placeName === selectedRestaurant;
+            });
+
+            // Reset to the first page when filtering
+            currentPage = 1;
+
+            // Display the filtered reviews with pagination
+            FilterReviewsTable(filteredReviews);
+        }
+
+        // Function to handle the response for reviews
+        function HandleReviewsResponse(response) {
+            try {
+                var data = JSON.parse(response);
+
+                if (data.status === "success") {
+                    allReviews = data.reviews;
+
+                    // Filter unique placeNames
+                    var uniquePlaceNames = [];
+                    var placeNameMap = new Map();
+                    allReviews.forEach(function (review) {
+                        if (!placeNameMap.has(review.placeName)) {
+                            placeNameMap.set(review.placeName, true);
+                            uniquePlaceNames.push(review);
+                        }
+                    });
+
+                    // Populate the Filter Restaurants dropdown
+                    var filterDropdown = document.getElementById("filterRestaurant");
+                    filterDropdown.innerHTML = ""; // Clear existing options
+                    uniquePlaceNames.forEach(function (place) {
+                        var option = document.createElement("option");
+                        option.value = place.placeName;
+                        option.text = place.placeName;
+                        filterDropdown.appendChild(option);
+                    });
+
+                    // Populate the Rate and Review dropdown
+                    var placeDropdown = document.getElementById("placeName");
+                    placeDropdown.innerHTML = ""; // Clear existing options
+                    uniquePlaceNames.forEach(function (place) {
+                        var option = document.createElement("option");
+                        option.value = place.placeName;
+                        option.text = place.placeName;
+                        placeDropdown.appendChild(option);
+                    });
+
+                    // Display the reviews table
+                    FilterReviewsTable(allReviews);
+                } else {
+                    document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
+                }
+            } catch (e) {
+                document.getElementById("reviewsTableResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+            }
+        }
+
+        // Function to display the reviews table with pagination
+        function FilterReviewsTable(reviews) {
+            var startIndex = (currentPage - 1) * reviewsPerPage;
+            var endIndex = startIndex + reviewsPerPage;
+            var paginatedReviews = reviews.slice(startIndex, endIndex);
+
+            var html = "<h3>Reviews Table:</h3><table border='1'><tr><th>ID</th><th>Place Name</th><th>Place Address</th><th>Provider</th><th>Review Text</th><th>Review Date</th><th>Review Rating</th><th>Author Name</th></tr>";
+
+            paginatedReviews.forEach(function (review) {
+                html += `<tr>
+                    <td>${review.id}</td>
+                    <td>${review.placeName}</td>
+                    <td>${review.placeAddress}</td>
+                    <td>${review.provider}</td>
+                    <td>${review.reviewText}</td>
+                    <td>${review.reviewDate}</td>
+                    <td>${review.reviewRating}</td>
+                    <td>${review.authorName}</td>
+                </tr>`;
+            });
+
+            html += "</table>";
+            document.getElementById("reviewsTableResponse").innerHTML = html;
+
+            // Add pagination controls
+            var totalPages = Math.ceil(reviews.length / reviewsPerPage);
+            var paginationHtml = `<div>Page ${currentPage} of ${totalPages}</div>`;
+            paginationHtml += `<button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+            paginationHtml += `<button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            document.getElementById("paginationControls").innerHTML = paginationHtml;
+        }
+
+        // Function to change the current page
+        function changePage(offset) {
+            currentPage += offset;
+            // Use filteredReviews if filtering is active, otherwise use allReviews
+            var reviewsToDisplay = filteredReviews.length > 0 ? filteredReviews : allReviews;
+            FilterReviewsTable(reviewsToDisplay);
+        }
+
+        // Submit a rating and review
+        function SubmitRatingReview(event) {
+            event.preventDefault();
+
+            var rating = document.getElementById("rating").value;
+            var review = document.getElementById("review").value;
+            var placeName = document.getElementById("placeName").value;
+            var username = sessionStorage.getItem('username'); // Get the logged-in user's username
+
+            if (!username) {
+                alert("You must be logged in to submit a review.");
+                return;
+            }
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    var response = JSON.parse(request.responseText);
+                    if (response.status === "success") {
+                        alert("Review submitted successfully!");
+                        FetchAndDisplayReviews(placeName); // Refresh the reviews for the selected place
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                }
+            };
+
+            var submitReviewRequest = {
+                type: "submit_rating_review",
+                username: username,
+                placeName: placeName,
+                rating: rating,
+                review: review
+            };
+
+            request.send(JSON.stringify(submitReviewRequest));
+        }
+
+        // Function to fetch and display reviews for a specific place
+        function FetchAndDisplayReviews(placeName) {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    HandleRatingsReviewsResponse(request.responseText);
+                }
+            };
+
+            var fetchReviewsRequest = {
+                type: "fetch_ratings_reviews",
+                placeName: placeName
+            };
+
+            request.send(JSON.stringify(fetchReviewsRequest));
+        }
+
+        // Handle the response for fetching reviews
+        function HandleRatingsReviewsResponse(response) {
+            try {
+                var data = JSON.parse(response);
+
+                if (data.status === "success") {
+                    var reviews = data.reviews;
+                    var html = "<h3>Reviews:</h3><ul>";
+
+                    reviews.forEach(function (review) {
+                        html += `<li><strong>${review.username}</strong> (Rating: ${review.rating}) - ${review.review} <em>(${review.created_at})</em></li>`;
+                    });
+
+                    html += "</ul>";
+                    document.getElementById("reviewsResponse").innerHTML = html;
+                } else {
+                    document.getElementById("reviewsResponse").innerHTML = "Error: " + data.message;
+                }
+            } catch (e) {
+                document.getElementById("reviewsResponse").innerHTML = "Error parsing response: " + e.message + "<p>" + response;
+            }
+        }
+
+        // Logout function
+        function SendLogoutRequest() {
             var request = new XMLHttpRequest();
             request.open("POST", "login.php", true);
             request.setRequestHeader("Content-Type", "application/json");
@@ -27,7 +278,7 @@
                 type: "logout"
             };
 
-            request.onreadystatechange = function() {
+            request.onreadystatechange = function () {
                 if (request.readyState == 4 && request.status == 200) {
                     var response = JSON.parse(request.responseText);
                     if (response.status === "success") {
@@ -36,8 +287,14 @@
                     }
                 }
             };
+
             request.send(JSON.stringify(logoutRequest));
         }
+
+        // Automatically load reviews when the page loads
+        window.onload = function () {
+            FetchReviewsTable();
+        };
     </script>
 </body>
 </html>
