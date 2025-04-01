@@ -1,5 +1,5 @@
 <?php
-require_once('/path/to/vendor/autoload.php'); // Adjust if using Composer
+require_once(__DIR__ . '/vendor/autoload.php');
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
