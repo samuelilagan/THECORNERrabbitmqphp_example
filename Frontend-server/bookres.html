@@ -3,47 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-    <title>Book a Reservation</title>
-</head>
-<body>
-    <h2>Book a Reservation</h2>
-    <form id="reservationForm">
-        <label for="restaurant">Restaurant Name:</label>
-        <input type="text" id="restaurant" name="restaurant" required><br><br>
-
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required><br><br>
-
-        <label for="time">Time:</label>
-        <input type="time" id="time" name="time" required><br><br>
-
-        <button type="submit">Create Invite</button>
-    </form>
-
-    <h3>Share This Link:</h3>
-    <input type="text" id="inviteLink" readonly style="width: 100%;" />
-    <button onclick="copyLink()">Copy Link</button>
-
-    <script>
-        document.getElementById("reservationForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevents form from refreshing the page
-            
-            const restaurant = encodeURIComponent(document.getElementById("restaurant").value);
-            const date = encodeURIComponent(document.getElementById("date").value);
-            const time = encodeURIComponent(document.getElementById("time").value);
-
-            const inviteUrl = `http://localhost/invite.html?restaurant=${restaurant}&date=${date}&time=${time}`;
-            document.getElementById("inviteLink").value = inviteUrl;
-        });
-
-        function copyLink() {
-            const linkField = document.getElementById("inviteLink");
-            linkField.select();
-            document.execCommand("copy");
-            alert("Invite link copied!");
-        }
-=======
     <title>Reservation System</title>
 </head>
 <body>
@@ -303,7 +262,7 @@
             FetchRestaurants();
             FetchReservations();
         };
->>>>>>> 671eeb4e0f5adec62353fd0f0869d97bf78c8d10
     </script>
 </body>
 </html>
+
