@@ -19,55 +19,58 @@ function loadScript(scriptUrl) {
     script.async = true;  // Load asynchronously
     document.body.appendChild(script);
 }
-//serve static files from 'it490' folder
-//app.use(express.static(path.join(__dirname, 'it490')));
+app.get('/notiflanding', (req, res) => {
+  res.sendFile(path.join(__dirname, 'notiflanding.html'));
+});
 
-//route to serve notiflanding.html
-app.get("/notiflanding.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "/", "notiflanding.html"));
-})
 
  
 // Middleware to parse form data
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); // <--this line SHOULD parse JSON input from frontend
 
 // Serve the HTML form
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/notiftest.html');
 });
 
+// Serve notiflanding.html explicitly
+app.get('/notiflanding.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'notiflanding.html'));
+});
+
+
 // Handle form submission
-app.post('/submit', (req, res) => {
-    // Get data from the form
+app.post('/submit', async (req, res) => {
+  try {
     const email = req.body.email;
     const number = req.body.number;
 
-    // Log the form data in the terminal
-    console.log('User Data:');
-    console.log('Number:', number);
+    console.log('User Data Received:');
     console.log('Email:', email);
+    console.log('Number:', number);
 
-    notificationapi.send({
-    notificationId: 'test',
-    user: {
-    id: "'" + email +"'",
-    email: "'" + email +"'",
-    number: "'+1'" + number +'"' // Replace with your phone number, use format [+][country code][area code][local number]
-  },
-  mergeTags: {
-    "comment": "You will have an upcoming reservation!",
-    "commentId": "testCommentId"
+    await notificationapi.send({
+      notificationId: 'test',
+      user: {
+      id: "'" + email +"'",
+      email: "'" + email +"'",
+      number: "'+1'" + number +'"' // Replace with your phone number, use format [+][country code][area code][local number]
+      },
+      mergeTags: {
+        "comment": "You will have an upcoming reservation!",
+        "commentId": "testCommentId"
+      }
+    });
+
+    res.status(200).json({ status: "success", message: `Notification sent to ${email}` });
+
+  } catch (err) {
+    console.error("Error in /submit:", err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
-})
-
-
-    return email,number;
-    module.exports = email;
-    module.exports = number;
-
-    // Respond back to the user
-    res.send(`Thank you for your email, ${email}. We have received your information.`);
 });
+
 
  
 
