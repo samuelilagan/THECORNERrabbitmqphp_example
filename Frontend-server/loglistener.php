@@ -3,8 +3,8 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-// ACE'S IP?
-$connection = new AMQPStreamConnection('172.28.197.192', 5672, 'guest', 'guest');
+// ACE'S IP under localhost
+$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
 $channel = $connection->channel();
 $channel->queue_declare('logQueue', false, true, false, false);
 
@@ -19,7 +19,6 @@ $callback = function ($msg) {
 
 $channel->basic_consume('logQueue', '', false, true, false, false, $callback);
 
-// Keep the script running
-while ($channel->is_consuming()) {
+while (true) {
     $channel->wait();
 }
