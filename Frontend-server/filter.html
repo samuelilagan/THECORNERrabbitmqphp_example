@@ -3,7 +3,16 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Restaurant Filter</title>
+   <link rel="stylesheet" href="slicknav.css">
+    <link rel="stylesheet" href="corner.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="jquery.slicknav.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		$('#nav_menu').slicknav({prependTo:"#mobile_menu"});
+			});
+    </script>
+   <title>Preference Filter</title>
    <script>
        // Handle server responses
        function HandleFilterResponse(response) {
@@ -104,7 +113,20 @@
    </script>
 </head>
 <body>
-   <h1>The Corner Table</h1>
+    <h1>Welcome to The Corner Table!</h1>
+
+    <nav id="mobile_menu">
+
+	</nav>
+	<nav id="nav_menu">
+    	<ul>
+        	<li><a href="http://www.sample.com/home.html">Home</a></li>
+        	<li><a href="http://www.sample.com/filter.html" class="current">Preference Filter</a></li>
+        	<li><a href="http://172.28.71.226:3001">Notifications</a></li>
+        	<li><a href="http://www.sample.com/bookres.html">Reservations</a></li>
+        	<li><a href="http://www.sample.com/invite.html">Invite</a></li>
+    	</ul>
+	</nav>   
   
    <h2>Filter for Restaurants</h2>
    <form onsubmit="SendFilterRequest(event)">

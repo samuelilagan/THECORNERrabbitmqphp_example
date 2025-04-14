@@ -4,17 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+    <link rel="stylesheet" href="slicknav.css">
+    <link rel="stylesheet" href="corner.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="jquery.slicknav.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		$('#nav_menu').slicknav({prependTo:"#mobile_menu"});
+			});
+	</script>
+    <title>Reservation System</title>
 </head>
 <body>
     <h1>Welcome to The Corner Table!</h1>
 
-    <h2>User Information</h2>
-    <p>Welcome, <span id="username">Guest</span>!</p>
+    <nav id="mobile_menu">
 
-    <a href="filter.html"><h2>Filter for Restaurants by Preference</h2></a>
-    <a href="http://172.28.71.226:3000/"><h2>Sign Up for Test/Email Notifications</h2></a>
-    <a href="bookres.html"><h2>Book a Reservation</h2></a>
-    <a href="invite.html"><h2>Send an Invite Link</h2></a>
+	</nav>
+	<nav id="nav_menu">
+    	<ul>
+        	<li><a href="http://www.sample.com/home.html" class="current">Home</a></li>
+        	<li><a href="http://www.sample.com/filter.html">Preference Filter</a></li>
+        	<li><a href="http://172.28.71.226:3001">Notifications</a></li>
+        	<li><a href="http://www.sample.com/bookres.html">Reservations</a></li>
+        	<li><a href="http://www.sample.com/invite.html">Invite</a></li>
+    	</ul>
+	</nav>
 
     <h2>Filter Restaurants</h2>
     <select id="filterRestaurant">
