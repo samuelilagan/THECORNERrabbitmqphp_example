@@ -16,7 +16,7 @@ function log_error($message, $file = null, $line = null) {
         'timestamp' => $timestamp
     ]);
 // replace with ace's IP?
-    $connection = new AMQPStreamConnection('REPLACE_WITH_RABBITMQ_IP', 5672, 'guest', 'guest');
+    $connection = new AMQPStreamConnection('172.28.197.192', 5672, 'guest', 'guest');
     $channel = $connection->channel();
     $channel->queue_declare('logQueue', false, true, false, false);
 
