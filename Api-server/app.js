@@ -42,8 +42,8 @@ app.post('/submit', (req, res) => {
     notificationapi.send({
     notificationId: 'test',
     user: {
-    id: "''" + email +'"',
-    email: "''" + email +'"',
+    id: '"' + email +'"',
+    email: '"' + email +'"',
     number: "'+1'" + number +'"' // Replace with your phone number, use format [+][country code][area code][local number]
   },
   mergeTags: {

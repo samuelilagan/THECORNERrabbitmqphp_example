@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => '4e5c95399a8734309b55ee45e9e699c41d05422a',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => '4e5c95399a8734309b55ee45e9e699c41d05422a',
             'dev_requirement' => false,
         ),
         'notificationapi/notificationapi-php-server-sdk' => array(
@@ -28,6 +28,24 @@
             'reference' => 'e01144f2253a5ce34dcb11ca336238756fafc59a',
             'dev_requirement' => false,
         ),
+        'paragonie/constant_time_encoding' => array(
+            'pretty_version' => 'v3.0.0',
+            'version' => '3.0.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../paragonie/constant_time_encoding',
+            'aliases' => array(),
+            'reference' => 'df1e7fde177501eee2037dd159cf04f5f301a512',
+            'dev_requirement' => false,
+        ),
+        'paragonie/random_compat' => array(
+            'pretty_version' => 'v9.99.100',
+            'version' => '9.99.100.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../paragonie/random_compat',
+            'aliases' => array(),
+            'reference' => '996434e5492cb4c3edcb9168db6fbb1359ef965a',
+            'dev_requirement' => false,
+        ),
         'pheromone/phpcs-security-audit' => array(
             'pretty_version' => '2.0.1',
             'version' => '2.0.1.0',
@@ -35,6 +53,24 @@
             'install_path' => __DIR__ . '/../pheromone/phpcs-security-audit',
             'aliases' => array(),
             'reference' => '68a6c53a57156a5efb2073b1eb3f2d79a46c9dc2',
+            'dev_requirement' => false,
+        ),
+        'php-amqplib/php-amqplib' => array(
+            'pretty_version' => 'v3.7.3',
+            'version' => '3.7.3.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-amqplib/php-amqplib',
+            'aliases' => array(),
+            'reference' => '9f50fe69a9f1a19e2cb25596a354d705de36fe59',
+            'dev_requirement' => false,
+        ),
+        'phpseclib/phpseclib' => array(
+            'pretty_version' => '3.0.43',
+            'version' => '3.0.43.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpseclib/phpseclib',
+            'aliases' => array(),
+            'reference' => '709ec107af3cb2f385b9617be72af8cf62441d02',
             'dev_requirement' => false,
         ),
         'squizlabs/php_codesniffer' => array(
@@ -45,6 +81,12 @@
             'aliases' => array(),
             'reference' => 'ba05f990e79cbe69b9f35c8c1ac8dca7eecc3a10',
             'dev_requirement' => false,
+        ),
+        'videlalvaro/php-amqplib' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => 'v3.7.3',
+            ),
         ),
     ),
 );
