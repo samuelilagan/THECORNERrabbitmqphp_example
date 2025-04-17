@@ -206,7 +206,7 @@
             var rating = document.getElementById("rating").value;
             var review = document.getElementById("review").value;
             var placeName = document.getElementById("placeName").value;
-            var sessionToken = sessionStorage.getItem('sessionToken'); // Get the logged-in user's sessionToken
+            var username = sessionStorage.getItem('username'); // need to use username because the session storage username is checked with the database
 
             if (!username) {
                 alert("You must be logged in to submit a review.");
