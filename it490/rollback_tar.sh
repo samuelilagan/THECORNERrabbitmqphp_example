@@ -49,7 +49,7 @@ fi
 echo "Latest FAIL tar:   $FAILED_TAR"
 echo "Latest PASS tar:   $PASSED_TAR"
 
-REAL_PASSED_TAR = $PASSED_TAR
+
 
 # ── File existence ─────────────────────────────────────────────────────────────
 if [[ ! -f "$TAR_DIR/$PASSED_TAR" ]]; then
@@ -64,11 +64,11 @@ cp "$TAR_DIR/$FAILED_TAR" "$TAR_DIR/${FAILED_TAR}.bak.$(date +%s)" || true
 cp -f "$TAR_DIR/$PASSED_TAR" "$TAR_DIR/$FAILED_TAR"
 
 echo "Replaced $FAILED_TAR with contents of $PASSED_TAR"
-echo "Using original filename: $FAILED_TAR (now contains the contents of $REAL_PASSED_TAR)"
+echo "Using original filename: $FAILED_TAR (now contains the contents of $PASSED_TAR)"
 
 # ── Redeploy ───────────────────────────────────────────────────────────────────
 if ssh "$QA_USER@$QA_VM" "bash $DEPLOY_SCRIPT $PASSED_TAR"; then
-  echo "Redeploy of $FAILED_TAR (contents of $REAL_PASSED_TAR) succeeded"
+  echo "Redeploy of $FAILED_TAR (contents of $PASSED_TAR) succeeded"
 else
   echo "ERROR: Redeploy script failed for $FAILED_TAR"
   exit 3
