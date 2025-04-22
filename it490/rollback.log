@@ -1,0 +1,258 @@
+====== Rollback triggered at 2025-04-21 19:40:01 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:43:36 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:43:55 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:47:00 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:48:43 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:49:23 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:49:48 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:50:08 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:53:35 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:56:34 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 19:59:02 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:00:23 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:06:00 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:18:04 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:23:19 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:25:28 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:26:35 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:27:24 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+ERROR: Could not find both FAIL and PASS tarballs. Aborting.
+====== Rollback triggered at 2025-04-21 20:33:19 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:40:12 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:40:21 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:41:15 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:41:29 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1142 (42000) at line 2: SELECT command denied to user 'nagios'@'localhost' for table 'tar_status'
+====== Rollback triggered at 2025-04-21 20:45:41 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+bash: /home/acepino/git/rabbitmqphp_example/it490/deploy_tar.sh: No such file or directory
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 20:55:12 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_203734.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+[ERROR] Setup script failed - check /home/qavm/deployment.log for details
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:05:30 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+ls: cannot access '/home/qavm/received_backups/rabbitmqphp_deployment_*.tar.gz': No such file or directory
+[ERROR] No deployment packages found in /home/qavm/received_backups
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:05:58 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+ls: cannot access '/home/qavm/received_backups/rabbitmqphp_deployment_*.tar.gz': No such file or directory
+[ERROR] No deployment packages found in /home/qavm/received_backups
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:07:25 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_203734.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:07:33 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_203734.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:07:40 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_203734.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_203734.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_203734.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_203734.tar.gz
+====== Rollback triggered at 2025-04-21 21:13:28 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_211207.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_192211.tar.gz
+Replaced rabbitmqphp_deployment_20250421_211207.tar.gz with rabbitmqphp_deployment_20250421_192211.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_211207.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+[ERROR] Setup script failed - check /home/qavm/deployment.log for details
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_211207.tar.gz
+====== Rollback triggered at 2025-04-21 21:27:34 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with rabbitmqphp_deployment_20250421_212400.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212553.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 21:28:09 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with rabbitmqphp_deployment_20250421_212400.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212553.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 21:28:13 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with rabbitmqphp_deployment_20250421_212400.tar.gz
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212553.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 22:06:17 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with contents of rabbitmqphp_deployment_20250421_212400.tar.gz
+Using original filename: rabbitmqphp_deployment_20250421_212553.tar.gz (now contains the contents of rabbitmqphp_deployment_20250421_212400.tar.gz)
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212553.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 22:15:35 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with contents of rabbitmqphp_deployment_20250421_212400.tar.gz
+Using original filename: rabbitmqphp_deployment_20250421_212553.tar.gz (now contains the contents of rabbitmqphp_deployment_20250421_212400.tar.gz)
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212400.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 22:19:13 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with contents of rabbitmqphp_deployment_20250421_212400.tar.gz
+Using original filename: rabbitmqphp_deployment_20250421_212553.tar.gz (now contains the contents of rabbitmqphp_deployment_20250421_212400.tar.gz)
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212400.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+ERROR: Redeploy script failed for rabbitmqphp_deployment_20250421_212553.tar.gz
+====== Rollback triggered at 2025-04-21 22:20:39 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_212553.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_212400.tar.gz
+Replaced rabbitmqphp_deployment_20250421_212553.tar.gz with contents of rabbitmqphp_deployment_20250421_212400.tar.gz
+Using original filename: rabbitmqphp_deployment_20250421_212553.tar.gz (now contains the contents of rabbitmqphp_deployment_20250421_212400.tar.gz)
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_212400.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+=== Deployment completed successfully ===
+Full log available at: /home/qavm/deployment.log
+Redeploy of rabbitmqphp_deployment_20250421_212553.tar.gz (contents of rabbitmqphp_deployment_20250421_212400.tar.gz) succeeded
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Logged rollback event to tar_status table.
+====== Rollback complete at 2025-04-21 22:21:46 ======
+====== Rollback triggered at 2025-04-21 22:28:34 ======
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Latest FAIL tar:   rabbitmqphp_deployment_20250421_222656.tar.gz
+Latest PASS tar:   rabbitmqphp_deployment_20250421_222354.tar.gz
+Replaced rabbitmqphp_deployment_20250421_222656.tar.gz with contents of rabbitmqphp_deployment_20250421_222354.tar.gz
+Using original filename: rabbitmqphp_deployment_20250421_222656.tar.gz (now contains the contents of rabbitmqphp_deployment_20250421_222354.tar.gz)
+Using package: /home/qavm/received_backups/rabbitmqphp_deployment_20250421_222354.tar.gz
+Preparing deployment directory...
+Extracting package...
+Executing setup script...
+=== Deployment completed successfully ===
+Full log available at: /home/qavm/deployment.log
+Redeploy of rabbitmqphp_deployment_20250421_222656.tar.gz (contents of rabbitmqphp_deployment_20250421_222354.tar.gz) succeeded
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Logged rollback event to tar_status table.
+====== Rollback complete at 2025-04-21 22:29:43 ======
