@@ -3,32 +3,58 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <link rel="stylesheet" href="slicknav.css">
-    <link rel="stylesheet" href="corner.css">
+ <!--link rel="stylesheet" href="slicknav.css">
+    <link rel="stylesheet" href="corner.css"-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="jquery.slicknav.min.js"></script>
+	<!--script src="jquery.slicknav.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 		$('#nav_menu').slicknav({prependTo:"#mobile_menu"});
 			});
-    </script>
+    </script-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous">
+  </script>
  <title>Notif Signup</title>
 </head>
 <body>
-  <h1>Welcome to The Corner Table!</h1>
+  <div class="container-fluid">
+    <div class="col-sm-6" class="pagetitle">
+      <h1>Welcome to The Corner Table!</h1>
+  </div>
 
-  <nav id="mobile_menu">
+  <nav class="navbar navbar-expand-md justify-content-start bg-dark navbar-dark col-12" id="nav_menu">
 
-</nav>
-<nav id="nav_menu">
-    <ul>
-        <li><a href="http://172.28.71.226/home.html">Home</a></li>
-        <li><a href="http://172.28.71.226/filter.html">Preference Filter</a></li>
-        <li><a href="http://172.28.71.226:3001" class="current">Notifications</a></li>
-        <li><a href="http://172.28.71.226/bookres.html">Reservations</a></li>
-        <li><a href="http://172.28.71.226/invite.html">Invite</a></li>
-    </ul>
-</nav>
+    <!-- Responsive Button for the smaller menu -->
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="http://172.28.71.226/home.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://172.28.71.226/filter.html">Preference Filter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://172.28.71.226:3001" class="current">Notifications</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://172.28.71.226/bookres.html">Reservations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://172.28.71.226/invite.html">Invite</a>
+            </li>
+        </ul>
+    </div>
+    </nav>
 
  <br><h2>Want to be notified for your reservation? Input your email and Cellphone # Below!</h2>
 
@@ -68,9 +94,10 @@
  });
 </script>
 
- <a href="filter.html"><h2></h2></a>
 
- <h2>Logout</h2>
+<div class="col-sm-6" class="pagetitle">
+  <h2>Logout</h2>
+</div>
  <button onclick="logout()">Logout</button>
 
  <script>
@@ -96,5 +123,6 @@
          request.send(JSON.stringify(logoutRequest));
      }
  </script>
+ </div>
 </body>
 </html>
