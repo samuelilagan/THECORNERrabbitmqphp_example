@@ -1,0 +1,16 @@
+[Unit]
+Description=My Custom Bash Service
+After=network.target
+
+[Service]
+ExecStart=/var/www/html/my-service.sh
+Restart=always
+User=dfc27vm
+Group=dfc27vm
+WorkingDirectory=/var/www/html
+StandardOutput=journal
+StandardError=inherit
+ExecStartPre=/bin/sleep 1
+
+[Install]
+WantedBy=multi-user.target
