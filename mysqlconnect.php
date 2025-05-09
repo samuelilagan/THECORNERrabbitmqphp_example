@@ -105,14 +105,15 @@ function doLogout($sessionToken) {
 }
 
 // Function to handle registration
-function doRegister($username, $password) {
+function doRegister($username, $password, $phone) {
     global $db;
 
-    // Print the request data received
-    echo "Received registration request: ";
-    var_dump(['username' => $username, 'password' => $password]);
+    // PHONE VALIDATION
+    if (empty($phone)) {
+        return ["status" => "error", "message" => "Phone number is required"];
+    }
 
-    // Check if user already exists
+    // Check if user exists
     $query = "SELECT * FROM user_info WHERE username = :username";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':username', $username);
@@ -123,19 +124,21 @@ function doRegister($username, $password) {
         return ["status" => "error", "message" => "User already exists"];
     }
 
-    // Hash the password before storing it in the database
+    // Hash password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert new user into the database
-    $insertQuery = "INSERT INTO user_info (username, password) VALUES (:username, :password)";
+    // Insert with PHONE
+    $insertQuery = "INSERT INTO user_info (username, password, phone) VALUES (:username, :password, :phone)";
     $insertStmt = $db->prepare($insertQuery);
     $insertStmt->bindParam(':username', $username);
     $insertStmt->bindParam(':password', $hashedPassword);
+    $insertStmt->bindParam(':phone', $phone);
 
     try {
         $insertStmt->execute();
         return ["status" => "success", "message" => "Registration successful"];
     } catch (PDOException $e) {
+        error_log("Database error: " . $e->getMessage());
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
 }
@@ -246,6 +249,7 @@ function fetchReviewsByRestaurant($placeName) {
     }
 }
 
+// Function for filter method
 // Function to handle filtering
 function doFilter($city, $keyword, $rating, $dietary, $cuisine) {
     global $db;
@@ -326,5 +330,119 @@ function doFilter($city, $keyword, $rating, $dietary, $cuisine) {
     }
  }
  
+ // Functions for bookres.php
+ // Function to book a reservation
+function bookReservation($restaurant, $date, $time, $username = null) {
+    global $db;
+
+    try {
+        // Check if the time slot is available
+        $checkQuery = "SELECT * FROM reservations 
+                      WHERE restaurant = :restaurant 
+                      AND date = :date 
+                      AND time = :time";
+        $checkStmt = $db->prepare($checkQuery);
+        $checkStmt->bindParam(':restaurant', $restaurant);
+        $checkStmt->bindParam(':date', $date);
+        $checkStmt->bindParam(':time', $time);
+        $checkStmt->execute();
+
+        if ($checkStmt->rowCount() > 0) {
+            return ["status" => "error", "message" => "This time slot is already booked"];
+        }
+
+        // Insert the new reservation
+        $insertQuery = "INSERT INTO reservations (restaurant, date, time, username) 
+                       VALUES (:restaurant, :date, :time, :username)";
+        $insertStmt = $db->prepare($insertQuery);
+        $insertStmt->bindParam(':restaurant', $restaurant);
+        $insertStmt->bindParam(':date', $date);
+        $insertStmt->bindParam(':time', $time);
+        $insertStmt->bindParam(':username', $username);
+        $insertStmt->execute();
+
+        return [
+            "status" => "success",
+            "message" => "Reservation booked successfully",
+            "reservation_id" => $db->lastInsertId()
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to book reservation: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to get user's reservations
+function getReservations($username = null) {
+    global $db;
+
+    try {
+        if ($username) {
+            // Get reservations for specific user
+            $query = "SELECT * FROM reservations 
+                     WHERE username = :username 
+                     ORDER BY date, time";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':username', $username);
+        } else {
+            // Get all reservations (for admin view if needed)
+            $query = "SELECT * FROM reservations ORDER BY date, time";
+            $stmt = $db->prepare($query);
+        }
+        
+        $stmt->execute();
+        $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "reservations" => $reservations
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to fetch reservations: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to cancel a reservation
+function cancelReservation($reservationId, $username = null) {
+    global $db;
+
+    try {
+        // Check if reservation exists and belongs to user (if username provided)
+        $checkQuery = "SELECT * FROM reservations 
+                      WHERE id = :id" . 
+                      ($username ? " AND username = :username" : "");
+        $checkStmt = $db->prepare($checkQuery);
+        $checkStmt->bindParam(':id', $reservationId);
+        if ($username) {
+            $checkStmt->bindParam(':username', $username);
+        }
+        $checkStmt->execute();
+
+        if ($checkStmt->rowCount() === 0) {
+            return ["status" => "error", "message" => "Reservation not found or not authorized"];
+        }
+
+        // Delete the reservation
+        $deleteQuery = "DELETE FROM reservations WHERE id = :id";
+        $deleteStmt = $db->prepare($deleteQuery);
+        $deleteStmt->bindParam(':id', $reservationId);
+        $deleteStmt->execute();
+
+        return [
+            "status" => "success",
+            "message" => "Reservation canceled successfully"
+        ];
+    } catch (PDOException $e) {
+        return [
+            "status" => "error",
+            "message" => "Failed to cancel reservation: " . $e->getMessage()
+        ];
+    }
+}
 
 ?>

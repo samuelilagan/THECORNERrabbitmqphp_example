@@ -6,6 +6,7 @@ require_once('rabbitMQLib.inc');
 require_once('mysqlconnect.php');  // Include mysqlconnect.php for database operations
 
 // Function to process the request (login, logout, etc.)
+// HELLO DJ 
 function requestProcessor($request)
 {
     echo "Received request" . PHP_EOL;
@@ -21,7 +22,8 @@ function requestProcessor($request)
         case "logout":
             return doLogout($request['sessionToken']);
         case "register":
-            return doRegister($request['username'], $request['password']);
+            // PHONE INCLUDED IN REGISTRATION
+            return doRegister($request['username'], $request['password'], $request['phone']);
         case "fetch_all_reviews":
             return fetchAllReviews();
         
@@ -46,6 +48,24 @@ function requestProcessor($request)
                $request['dietary'] ?? '',
                $request['cuisine'] ?? ''
            );
+        
+        case "book_reservation":
+            if (!isset($request['restaurant']) || !isset($request['date']) || !isset($request['time'])) {
+                return ["status" => "error", "message" => "Missing reservation fields"];
+            }
+            return bookReservation(
+                $request['restaurant'],
+                $request['date'],
+                $request['time'],
+                $request['username'] ?? null
+            );
+        case "get_reservations":
+            return getReservations($request['username'] ?? null);
+        case "cancel_reservation":
+            return cancelReservation(
+                $request['reservation_id'],
+                $request['username'] ?? null
+            );
 
         default:
             return ["status" => "error", "message" => "Invalid request type"];
