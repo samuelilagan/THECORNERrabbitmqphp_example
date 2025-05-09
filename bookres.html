@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--link rel="stylesheet" href="slicknav.css">
+    <link rel="stylesheet" href="corner.css"-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!--script src="jquery.slicknav.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		$('#nav_menu').slicknav({prependTo:"#mobile_menu"});
+			});
+	</script-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous">
+  </script>
+    <title>Reservation System</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="col-sm-6" class="pagetitle">
+            <h1>Welcome to The Corner Table!</h1>
+        </div>
+
+        <nav class="navbar navbar-expand-md justify-content-start bg-dark navbar-dark col-12" id="nav_menu">
+
+            <!-- Responsive Button for the smaller menu -->
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul>
+                    <li><a href="http://www.sample.com/home.html">Home</a></li>
+                    <li><a href="http://www.sample.com/filter.html">Preference Filter</a></li>
+                    <li><a href="http://172.28.71.226:3001">Notifications</a></li>
+                    <li><a href="http://www.sample.com/bookres.html">Reservations</a></li>
+                    <li><a href="http://www.sample.com/invite.html" class="current">Invite</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="col-sm-6" class="pagetitle">
+            <h2>Make a Reservation</h2>
+        </div>
+    <form id="reservationForm">
+        <label for="reservationRestaurant">Restaurant Name:</label>
+        <select id="reservationRestaurant" name="reservationRestaurant" required>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+        <br><br>
+        <label for="reservationDate">Date:</label>
+        <input type="date" id="reservationDate" name="reservationDate" required>
+        <br><br>
+        <label for="reservationTime">Time:</label>
+        <input type="time" id="reservationTime" name="reservationTime" required>
+        <br><br>
+        <button type="button" onclick="SubmitReservation()">Book Reservation</button>
+    </form>
+
+    <div class="col-sm-6" class="pagetitle">
+        <h2>My Reservations</h2>
+    </div>
+    <button onclick="FetchReservations()">Load My Reservations</button>
+    <div id="reservationsResponse">
+        <!-- Reservations will be displayed here -->
+    </div>
+
+    <div class="col-sm-6" class="pagetitle">
+        <h2>Logout</h2>
+    </div>
+    <button onclick="SendLogoutRequest()">Logout</button>
+
+    <script>
+        var allRestaurants = []; // Store all restaurants for dropdown
+
+        // Fetch and populate restaurants dropdown
+        function FetchRestaurants() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    try {
+                        var data = JSON.parse(request.responseText);
+                        if (data.status === "success") {
+                            allRestaurants = data.reviews;
+                            PopulateRestaurantDropdown();
+                        }
+                    } catch (e) {
+                        console.error("Error parsing restaurants:", e);
+                    }
+                }
+            };
+
+            var fetchRequest = {
+                type: "fetch_all_reviews"
+            };
+
+            request.send(JSON.stringify(fetchRequest));
+        }
+
+        // Populate the restaurant dropdown
+        function PopulateRestaurantDropdown() {
+            var dropdown = document.getElementById("reservationRestaurant");
+            dropdown.innerHTML = ""; // Clear existing options
+
+            // Add default option
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.text = "Select a restaurant";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            dropdown.appendChild(defaultOption);
+
+            // Get unique restaurant names
+            var uniqueRestaurants = [];
+            var restaurantMap = new Map();
+            allRestaurants.forEach(function (review) {
+                if (!restaurantMap.has(review.placeName)) {
+                    restaurantMap.set(review.placeName, true);
+                    uniqueRestaurants.push(review.placeName);
+                }
+            });
+
+            // Add restaurant options
+            uniqueRestaurants.forEach(function (restaurant) {
+                var option = document.createElement("option");
+                option.value = restaurant;
+                option.text = restaurant;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Submit a new reservation
+        function SubmitReservation() {
+            const requestData = {
+               type: 'book_reservation',
+               restaurant: document.getElementById("reservationRestaurant").value,
+               date: document.getElementById("reservationDate").value,
+               time: document.getElementById("reservationTime").value
+            };
+
+            console.log("Sending request:", requestData);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "bookres.php", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+               if (xhr.readyState === 4) {
+                     console.log("Raw response:", xhr.responseText);
+                     
+                     try {
+                        // First check if response is empty
+                        if (!xhr.responseText) {
+                           throw new Error("Empty response from server");
+                        }
+                        
+                        const response = JSON.parse(xhr.responseText);
+                        
+                        if (xhr.status === 200) {
+                           if (response.status === "success") {
+                                 alert("Reservation booked successfully!");
+                                 FetchReservations();
+                           } else {
+                                 alert("Error: " + (response.message || "Unknown error"));
+                           }
+                        } else {
+                           alert("Server error: " + xhr.status);
+                        }
+                     } catch (e) {
+                        console.error("Parsing error:", e);
+                        alert("Error parsing server response. See console for details.");
+                     }
+               }
+            };
+
+            xhr.onerror = function() {
+               alert("Request failed");
+            };
+
+            xhr.send(JSON.stringify(requestData));
+         }
+
+        // Fetch user's reservations
+        function FetchReservations() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "bookres.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    try {
+                        var data = JSON.parse(request.responseText);
+                        if (data.status === "success") {
+                            DisplayReservations(data.reservations);
+                        } else {
+                            document.getElementById("reservationsResponse").innerHTML = "Error: " + data.message;
+                        }
+                    } catch (e) {
+                        document.getElementById("reservationsResponse").innerHTML = "Error parsing response";
+                    }
+                }
+            };
+
+            var fetchRequest = {
+                type: "get_reservations"
+            };
+
+            request.send(JSON.stringify(fetchRequest));
+        }
+
+        // Display reservations
+        function DisplayReservations(reservations) {
+            var container = document.getElementById("reservationsResponse");
+            container.innerHTML = "";
+
+            if (!reservations || reservations.length === 0) {
+                container.innerHTML = "<p>No reservations found</p>";
+                return;
+            }
+
+            var html = "<ul>";
+            reservations.forEach(function(reservation) {
+                html += `<li>${reservation.restaurant} - ${reservation.date} at ${reservation.time} `;
+                html += `<button onclick="CancelReservation(${reservation.id})">Cancel</button></li>`;
+            });
+            html += "</ul>";
+
+            container.innerHTML = html;
+        }
+
+        // Cancel a reservation
+        function CancelReservation(reservationId) {
+            if (!confirm("Are you sure you want to cancel this reservation?")) {
+                return;
+            }
+
+            var request = new XMLHttpRequest();
+            request.open("POST", "bookres.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    try {
+                        var response = JSON.parse(request.responseText);
+                        if (response.status === "success") {
+                            alert("Reservation cancelled successfully!");
+                            FetchReservations();
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    } catch (e) {
+                        alert("Error parsing response");
+                    }
+                }
+            };
+
+            var cancelRequest = {
+                type: "cancel_reservation",
+                reservation_id: reservationId
+            };
+
+            request.send(JSON.stringify(cancelRequest));
+        }
+
+        // Logout function
+        function SendLogoutRequest() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "login.php", true);
+            request.setRequestHeader("Content-Type", "application/json");
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    var response = JSON.parse(request.responseText);
+                    if (response.status === "success") {
+                        window.location.href = "index.html";
+                    }
+                }
+            };
+
+            var logoutRequest = {
+                type: "logout"
+            };
+
+            request.send(JSON.stringify(logoutRequest));
+        }
+
+        // Load restaurants when page loads
+        window.onload = function() {
+            FetchRestaurants();
+            FetchReservations();
+        };
+    </script>
+    </div>
+</body>
+</html>

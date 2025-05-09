@@ -4,16 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+    <!--link rel="stylesheet" href="slicknav.css"-->
+    <!--link rel="stylesheet" href="corner.css"-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!--script src="jquery.slicknav.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		$('#nav_menu').slicknav({prependTo:"#mobile_menu"});
+			});
+	</script-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous">
+  </script>
+    <title>Reservation System</title>
 </head>
 <body>
-    <h1>Welcome to The Corner Table!</h1>
+    <div class="container-fluid">
+        <div class="col-sm-6" class="pagetitle">
+            <h1>Welcome to The Corner Table!</h1>
+        </div>
 
-    <h2>User Information</h2>
-    <p>Welcome, <span id="username">Guest</span>!</p>
+    <!--nav id="mobile_menu">
 
-    <a href="filter.html"><h2>Filter Recommendations</h2></a>
+	</nav>
+	<nav id="nav_menu">
+    	<ul>
+        	<li><a href="http://172.28.71.226/home.html" class="current">Home</a></li>
+        	<li><a href="http://172.28.71.226/filter.html">Preference Filter</a></li>
+        	<li><a href="http://172.28.71.226:3001">Notifications</a></li>
+        	<li><a href="http://172.28.71.226/bookres.html">Reservations</a></li>
+        	<li><a href="http://172.28.71.226/invite.html">Invite</a></li>
+    	</ul>
+	</nav-->
 
-    <h2>Filter Restaurants</h2>
+    <nav class="navbar navbar-expand-md justify-content-start bg-dark navbar-dark col-12" id="nav_menu">
+
+        <!-- Responsive Button for the smaller menu -->
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul>
+                <li><a href="http://www.sample.com/home.html">Home</a></li>
+                <li><a href="http://www.sample.com/filter.html">Preference Filter</a></li>
+                <li><a href="http://172.28.71.226:3001">Notifications</a></li>
+                <li><a href="http://www.sample.com/bookres.html">Reservations</a></li>
+                <li><a href="http://www.sample.com/invite.html" class="current">Invite</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="col-sm-6" class="pagetitle">
+        <h2>Filter Restaurants</h2>
+    </div>
     <select id="filterRestaurant">
         <!-- Options will be populated by JavaScript -->
     </select>
@@ -24,8 +73,13 @@
     <div id="reviewsTableResponse">
         <!-- Reviews table will be displayed here -->
     </div>
+    <div id="paginationControls">
+        <!-- Pagination controls will be displayed here -->
+    </div>
 
-    <h2>Rate and Review</h2>
+    <div class="col-sm-6" class="pagetitle">
+        <h2>Rate and Review</h2>
+    </div>
     <form id="rateAndReviewForm" onsubmit="SubmitRatingReview(event)">
         <label for="placeName">Place Name:</label>
         <select id="placeName" name="placeName" required>
@@ -41,15 +95,25 @@
         <input type="submit" value="Submit">
     </form>
 
-    <h2>Reviews</h2>
+
+    <div class="col-sm-6" class="pagetitle">
+        <h2>Reviews</h2>
+    </div>
     <div id="reviewsResponse">
         <!-- Reviews will be displayed here -->
     </div>
 
-    <h2>Logout</h2>
+    <div class="col-sm-6" class="pagetitle">
+        <h2>Logout</h2>
+    </div>
     <button onclick="SendLogoutRequest()">Logout</button>
 
     <script>
+        var currentPage = 1;
+        var reviewsPerPage = 10; // Number of reviews per page
+        var allReviews = []; // Store all reviews
+        var filteredReviews = []; // Store filtered reviews
+
         // Fetch and populate the reviews table
         function FetchReviewsTable() {
             var request = new XMLHttpRequest();
@@ -73,28 +137,16 @@
         function FilterReviewsByRestaurant() {
             var selectedRestaurant = document.getElementById("filterRestaurant").value;
 
-            var request = new XMLHttpRequest();
-            request.open("POST", "login.php", true);
-            request.setRequestHeader("Content-Type", "application/json");
+            // Filter reviews based on the selected restaurant
+            filteredReviews = allReviews.filter(function (review) {
+                return review.placeName === selectedRestaurant;
+            });
 
-            request.onreadystatechange = function () {
-                if (request.readyState == 4 && request.status == 200) {
-                    var data = JSON.parse(request.responseText);
+            // Reset to the first page when filtering
+            currentPage = 1;
 
-                    if (data.status === "success") {
-                        FilterReviewsTable(data.tables); // Update the table with filtered data
-                    } else {
-                        document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
-                    }
-                }
-            };
-
-            var filterRequest = {
-                type: "filter_reviews_by_restaurant",
-                placeName: selectedRestaurant
-            };
-
-            request.send(JSON.stringify(filterRequest));
+            // Display the filtered reviews with pagination
+            FilterReviewsTable(filteredReviews);
         }
 
         // Function to handle the response for reviews
@@ -103,12 +155,12 @@
                 var data = JSON.parse(response);
 
                 if (data.status === "success") {
-                    var reviews = data.reviews;
+                    allReviews = data.reviews;
 
                     // Filter unique placeNames
                     var uniquePlaceNames = [];
                     var placeNameMap = new Map();
-                    reviews.forEach(function (review) {
+                    allReviews.forEach(function (review) {
                         if (!placeNameMap.has(review.placeName)) {
                             placeNameMap.set(review.placeName, true);
                             uniquePlaceNames.push(review);
@@ -136,7 +188,7 @@
                     });
 
                     // Display the reviews table
-                    FilterReviewsTable(reviews);
+                    FilterReviewsTable(allReviews);
                 } else {
                     document.getElementById("reviewsTableResponse").innerHTML = "Error: " + data.message;
                 }
@@ -145,11 +197,15 @@
             }
         }
 
-        // Function to display the reviews table
+        // Function to display the reviews table with pagination
         function FilterReviewsTable(reviews) {
+            var startIndex = (currentPage - 1) * reviewsPerPage;
+            var endIndex = startIndex + reviewsPerPage;
+            var paginatedReviews = reviews.slice(startIndex, endIndex);
+
             var html = "<h3>Reviews Table:</h3><table border='1'><tr><th>ID</th><th>Place Name</th><th>Place Address</th><th>Provider</th><th>Review Text</th><th>Review Date</th><th>Review Rating</th><th>Author Name</th></tr>";
 
-            reviews.forEach(function (review) {
+            paginatedReviews.forEach(function (review) {
                 html += `<tr>
                     <td>${review.id}</td>
                     <td>${review.placeName}</td>
@@ -164,6 +220,21 @@
 
             html += "</table>";
             document.getElementById("reviewsTableResponse").innerHTML = html;
+
+            // Add pagination controls
+            var totalPages = Math.ceil(reviews.length / reviewsPerPage);
+            var paginationHtml = `<div>Page ${currentPage} of ${totalPages}</div>`;
+            paginationHtml += `<button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+            paginationHtml += `<button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            document.getElementById("paginationControls").innerHTML = paginationHtml;
+        }
+
+        // Function to change the current page
+        function changePage(offset) {
+            currentPage += offset;
+            // Use filteredReviews if filtering is active, otherwise use allReviews
+            var reviewsToDisplay = filteredReviews.length > 0 ? filteredReviews : allReviews;
+            FilterReviewsTable(reviewsToDisplay);
         }
 
         // Submit a rating and review
@@ -173,7 +244,7 @@
             var rating = document.getElementById("rating").value;
             var review = document.getElementById("review").value;
             var placeName = document.getElementById("placeName").value;
-            var username = sessionStorage.getItem('username'); // Get the logged-in user's username
+            var username = sessionStorage.getItem('username'); // need to use username because the session storage username is checked with the database
 
             if (!username) {
                 alert("You must be logged in to submit a review.");
@@ -221,7 +292,7 @@
 
             var fetchReviewsRequest = {
                 type: "fetch_ratings_reviews",
-                placeName: placeName // Use placeName instead of table_id
+                placeName: placeName
             };
 
             request.send(JSON.stringify(fetchReviewsRequest));
@@ -250,7 +321,6 @@
             }
         }
 
-
         // Logout function
         function SendLogoutRequest() {
             var request = new XMLHttpRequest();
@@ -275,9 +345,10 @@
         }
 
         // Automatically load reviews when the page loads
-        // window.onload = function () {
-        //     FetchReviewsTable();
-        // };
+        window.onload = function () {
+            FetchReviewsTable();
+        };
     </script>
+    </div>
 </body>
 </html>
