@@ -4,8 +4,12 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Database connection settings
-$dsn = 'mysql:host=127.0.0.1;dbname=users';
+// Database connection settings (need to change this for using on other systems)
+// $dsn = 'mysql:host=127.0.0.1;dbname=users';
+$dsn = 'mysql:host=148.77.110.18;dbname=users'; 
+// Since you are connected through a VPN, use the VPN IP address of the VM hosting 
+// the database in mysqlconnect.php:
+// $dsn = 'mysql:host=VPN_IP_ADDRESS;dbname=users';
 $dbUser = 'testUser';
 $dbPassword = '12345';
 
@@ -59,7 +63,7 @@ function doLogin($username, $password) {
         $_SESSION['username'] = $username; // Store username in session
 
         // Optionally update the session token in the database
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $expiry = time() + (60 * 60); // expiration is 1 hour, can change based on needs
         $updateQuery = "UPDATE user_info SET session_token = :sessionToken, token_expiry = :expiry WHERE username = :username";
         $updateStmt = $db->prepare($updateQuery);
         $updateStmt->bindParam(':sessionToken', $sessionToken);
@@ -105,14 +109,15 @@ function doLogout($sessionToken) {
 }
 
 // Function to handle registration
-function doRegister($username, $password) {
+function doRegister($username, $password, $phone) {
     global $db;
 
-    // Print the request data received
-    echo "Received registration request: ";
-    var_dump(['username' => $username, 'password' => $password]);
+    // PHONE VALIDATION
+    if (empty($phone)) {
+        return ["status" => "error", "message" => "Phone number is required"];
+    }
 
-    // Check if user already exists
+    // Check if user exists
     $query = "SELECT * FROM user_info WHERE username = :username";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':username', $username);
@@ -123,19 +128,21 @@ function doRegister($username, $password) {
         return ["status" => "error", "message" => "User already exists"];
     }
 
-    // Hash the password before storing it in the database
+    // Hash password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert new user into the database
-    $insertQuery = "INSERT INTO user_info (username, password) VALUES (:username, :password)";
+    // Insert with PHONE
+    $insertQuery = "INSERT INTO user_info (username, password, phone) VALUES (:username, :password, :phone)";
     $insertStmt = $db->prepare($insertQuery);
     $insertStmt->bindParam(':username', $username);
     $insertStmt->bindParam(':password', $hashedPassword);
+    $insertStmt->bindParam(':phone', $phone);
 
     try {
         $insertStmt->execute();
         return ["status" => "success", "message" => "Registration successful"];
     } catch (PDOException $e) {
+        error_log("Database error: " . $e->getMessage());
         return ["status" => "error", "message" => "Registration failed: " . $e->getMessage()];
     }
 }
